@@ -7,30 +7,35 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f0f8ff; }
+        .logo { text-align: center; margin-bottom: 20px; }
+        .logo img { max-width: 250px; height: auto; }
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; margin-bottom: 5px; }
         input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
         button { background: #007bff; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; width: 100%; margin-bottom: 10px; font-size: 16px; }
         button:hover { background: #0056b3; }
         #preview { border: 1px solid #ddd; padding: 20px; margin-top: 20px; background: white; display: none; }
-        .azul-logo { text-align: center; font-size: 24px; color: #1e3a8a; margin-bottom: 20px; }
         #whatsapp-btn { background: #25D366; }
         #whatsapp-btn:hover { background: #128C7E; }
+        #baixar-pack { background: #dc3545; font-size: 18px; }
+        #baixar-pack:hover { background: #c82333; }
         #danfe-link { background: #28a745; }
-        #danfe-link:hover { background: #218838; }
     </style>
 </head>
 <body>
-    <div class="azul-logo">Azul Cargo Express ✈️</div>
+    <div class="logo">
+        <img src="https://seeklogo.com/images/A/azul-cargo-express-logo-3B8A8A8A8A-seeklogo.com.png" alt="Azul Cargo Express ✈️" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/2/2d/Azul_Cargo_Express_logo.png';">
+        <div style="font-size: 20px; color: #1e3a8a; margin-top: 10px;">CONFIRMAÇÃO DE ENTREGA</div>
+    </div>
     
     <form id="generatorForm">
         <div class="form-group">
-            <label>Número de Telefone (5511999999999):</label>
+            <label>Telefone (5511999999999):</label>
             <input type="tel" id="telefone" placeholder="5511999999999" required>
         </div>
         
         <div class="form-group">
-            <label>Nome do Destinatário:</label>
+            <label>Nome Destinatário:</label>
             <input type="text" id="nome" value="Sr. GUILHERME CHAVES VAZ" required>
         </div>
         
@@ -45,32 +50,31 @@
         </div>
         
         <div class="form-group">
-            <label>Chave de Acesso NF-e (44 dígitos):</label>
+            <label>Chave NF-e (44 dígitos):</label>
             <input type="text" id="chaveNFe" placeholder="43123456789012345678901234567890123456789012" maxlength="44" required>
         </div>
         
-        <button type="button" onclick="gerarPreview()">Gerar Mensagem + PDF</button>
+        <button type="button" onclick="gerarTudo()">🚀 Gerar Mensagem + Baixar PDFs NF + Confirmação</button>
     </form>
     
-    <div id="preview">
-        <h3>✅ Mensagem Pronta para WhatsApp:</h3>
-        <textarea id="mensagemTexto" rows="10" readonly style="background: #e9ecef;"></textarea>
+    <div id="preview" style="display:none;">
+        <h3>✅ Mensagem WhatsApp (SEM chave):</h3>
+        <textarea id="mensagemTexto" rows="8" readonly style="background: #e9ecef;"></textarea>
         <br>
-        <button id="whatsapp-btn" onclick="enviarWhatsApp()">📱 Abrir WhatsApp (anexar PDFs)</button>
-        <button onclick="baixarPDF()">🖨️ Baixar PDF Confirmação</button>
-        <button id="danfe-link" onclick="consultarMeuDanfe()">📄 Gerar DANFE NF-e MeuDanfe (Grátis)</button>
+        <button id="whatsapp-btn" onclick="enviarWhatsApp()">📱 Abrir WhatsApp Pronto</button>
     </div>
 
     <script>
-        function gerarPreview() {
-            const tel = document.getElementById('telefone').value;
-            const nome = document.getElementById('nome').value;
+        function gerarTudo() {
             const rastreio = document.getElementById('rastreio').value;
+            const nome = document.getElementById('nome').value;
             const remetente = document.getElementById('remetente').value;
+            const tel = document.getElementById('telefone').value;
             const chave = document.getElementById('chaveNFe').value;
             
-            if (!tel || !chave) return alert('Preencha telefone e chave NF-e!');
+            if (!tel || !chave || !rastreio) return alert('Preencha todos os campos!');
             
+            // Mensagem SEM chave NF
             const mensagem = `Boa tarde, ${nome}
 
 Falo da Azul Cargo Express ✈️
@@ -80,12 +84,24 @@ Pedimos que confirme por esta mensagem se a entrega foi realizada e se a mercado
 
 Esta confirmação ficará registrada em sistema como evidência formal de entrega.
 
-NF-e Chave: ${chave}
-
 Agradecemos o retorno.`;
             
             document.getElementById('mensagemTexto').value = mensagem;
             document.getElementById('preview').style.display = 'block';
+            
+            // 1. Baixa PDF Confirmação
+            setTimeout(() => baixarPDFConfirmacao(rastreio), 500);
+            
+            // 2. Abre MeuDanfe pra NF (usuário baixa manual)
+            setTimeout(() => window.open(`https://meudanfe.com.br/?chave=${chave}`, '_blank'), 1000);
+        }
+        
+        function baixarPDFConfirmacao(rastreio) {
+            const element = document.getElementById('preview');
+            html2pdf()
+                .from(element)
+                .set({ filename: `Confirmacao_AzulCargo_${rastreio}.pdf` })
+                .save();
         }
         
         function enviarWhatsApp() {
@@ -93,16 +109,7 @@ Agradecemos o retorno.`;
             const mensagem = encodeURIComponent(document.getElementById('mensagemTexto').value);
             window.open(`https://wa.me/${tel}?text=${mensagem}`);
         }
-        
-        function baixarPDF() {
-            const element = document.getElementById('preview');
-            html2pdf().from(element).save(`Confirmacao_AzulCargo_${document.getElementById('rastreio').value}.pdf`);
-        }
-        
-        function consultarMeuDanfe() {
-            const chave = document.getElementById('chaveNFe').value;
-            window.open(`https://meudanfe.com.br/?chave=${chave}`, '_blank');
-        }
     </script>
 </body>
 </html>
+
