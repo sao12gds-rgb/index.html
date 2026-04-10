@@ -4,12 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Minuta Azul</title>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
   <style>
     * { box-sizing: border-box; }
-
     html, body {
       width: 100%;
       max-width: 100%;
@@ -18,13 +15,9 @@
       padding: 0;
       font-family: Arial, sans-serif;
       background: #eef1f5;
-      color: #1f2937;
+      color: #111827;
     }
-
-    body.mobile-device {
-      background: #fff;
-    }
-
+    body.mobile-device { background: #fff; }
     .page {
       width: 100%;
       max-width: 920px;
@@ -33,7 +26,6 @@
       min-height: 100vh;
       padding: 16px;
     }
-
     .wizard-top {
       display: flex;
       justify-content: space-between;
@@ -42,7 +34,11 @@
       margin-bottom: 14px;
       flex-wrap: wrap;
     }
-
+    .wizard-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0b2d5c;
+    }
     .wizard-badge {
       background: #0b2d5c;
       color: #fff;
@@ -51,21 +47,8 @@
       font-size: 13px;
       font-weight: 700;
     }
-
-    .wizard-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #0b2d5c;
-    }
-
-    .step {
-      display: none;
-    }
-
-    .step.active-step {
-      display: block;
-    }
-
+    .step { display: none; }
+    .step.active-step { display: block; }
     .card {
       border: 1px solid #d1d5db;
       border-radius: 10px;
@@ -73,7 +56,6 @@
       margin-bottom: 14px;
       background: #fff;
     }
-
     .card-header {
       background: #0b2d5c;
       color: #fff;
@@ -81,44 +63,33 @@
       font-weight: 700;
       font-size: 14px;
     }
-
-    .card-body {
-      padding: 14px;
-    }
-
+    .card-body { padding: 14px; }
     .grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
     }
-
     .grid-1 {
       display: grid;
       grid-template-columns: 1fr;
       gap: 12px;
     }
-
     .grid-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
     }
-
     .field {
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
-
     .field label {
       font-size: 13px;
       font-weight: 700;
       color: #111827;
     }
-
-    input,
-    select,
-    textarea {
+    input, select, textarea {
       width: 100%;
       min-height: 42px;
       border: 1px solid #cbd5e1;
@@ -128,12 +99,10 @@
       font-size: 14px;
       outline: none;
     }
-
     textarea {
-      min-height: 100px;
+      min-height: 110px;
       resize: vertical;
     }
-
     .radio-group {
       display: flex;
       flex-wrap: wrap;
@@ -142,56 +111,18 @@
       min-height: 42px;
       padding: 8px 0;
     }
-
     .radio-option {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       font-size: 14px;
-      white-space: normal;
     }
-
     input[type="radio"] {
       width: auto;
       min-height: auto;
       accent-color: #0b2d5c;
       transform: scale(1.1);
     }
-
-    .review-box {
-      border: 1px dashed #94a3b8;
-      border-radius: 8px;
-      padding: 12px;
-      background: #f8fafc;
-      font-size: 13px;
-      line-height: 1.5;
-      white-space: pre-wrap;
-    }
-
-    .status-box {
-      margin-top: 10px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      display: none;
-    }
-
-    .status-box.show {
-      display: block;
-    }
-
-    .status-success {
-      background: #dcfce7;
-      color: #166534;
-      border: 1px solid #86efac;
-    }
-
-    .status-error {
-      background: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #fca5a5;
-    }
-
     .wizard-nav {
       position: sticky;
       bottom: 0;
@@ -202,7 +133,6 @@
       margin-top: 10px;
       border-top: 1px solid #e5e7eb;
     }
-
     .wizard-nav button {
       flex: 1;
       min-height: 48px;
@@ -214,89 +144,99 @@
       font-weight: 700;
       cursor: pointer;
     }
-
-    .wizard-nav button.secondary {
-      background: #64748b;
-    }
-
-    .wizard-nav button.success {
-      background: #166534;
-    }
-
-    #btnPdf,
-    #btnEnviar {
+    .wizard-nav button.secondary { background: #64748b; }
+    .wizard-nav button.success { background: #166534; }
+    #btnPdf, #btnEnviar { display: none; }
+    .status-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
       display: none;
     }
-
-    .logo-box {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+    .status-box.show { display: block; }
+    .status-success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
     }
-
-    .logo-box img {
-      max-height: 55px;
-      max-width: 180px;
-      width: auto;
-      height: auto;
+    .status-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
     }
-
+    .review-box {
+      border: 1px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 12px;
+      background: #f8fafc;
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
     .muted {
       color: #64748b;
       font-size: 12px;
     }
-
+    .signature-wrap {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .signature-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f8fafc;
+    }
+    .signature-toolbar button {
+      border: none;
+      background: #64748b;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .signature-canvas-box {
+      width: 100%;
+      overflow: hidden;
+      background: #fff;
+    }
+    #assinatura {
+      width: 100%;
+      height: 180px;
+      display: block;
+      background: #fff;
+      touch-action: none;
+    }
     @media (max-width: 768px) {
       body.mobile-device .page {
         max-width: 100%;
         padding: 12px;
       }
-
-      .grid,
-      .grid-3 {
+      .grid, .grid-3 {
         grid-template-columns: 1fr;
       }
-
+      input, select, textarea {
+        font-size: 16px;
+      }
       .wizard-title {
         font-size: 16px;
       }
-
-      input,
-      select,
-      textarea {
-        font-size: 16px;
-      }
-
-      .wizard-nav {
-        padding-bottom: 8px;
-      }
     }
-
     @media print {
-      body {
-        background: #fff;
-      }
-
-      .wizard-top,
-      .wizard-nav,
-      .status-box {
-        display: none !important;
-      }
-
-      .step {
-        display: block !important;
-      }
-
-      .page {
-        max-width: none;
-        padding: 0;
-      }
-
-      .card {
-        break-inside: avoid;
-      }
+      body { background: #fff; }
+      .wizard-top, .wizard-nav, .status-box { display: none !important; }
+      .step { display: block !important; }
+      .page { max-width: none; padding: 0; }
+      .card { break-inside: avoid; }
     }
   </style>
 </head>
@@ -304,7 +244,7 @@
   <div class="page">
     <div class="wizard-top">
       <div class="wizard-title">Minuta de Despacho de Carga</div>
-      <div class="wizard-badge" id="wizardStepLabel">Etapa 1 de 11</div>
+      <div class="wizard-badge" id="wizardStepLabel">Etapa 1 de 12</div>
     </div>
 
     <form id="minutaForm">
@@ -313,17 +253,13 @@
       <input type="hidden" name="altura_tela" id="altura_tela">
       <input type="hidden" name="user_agent" id="user_agent">
       <input type="hidden" name="pdf_base64" id="pdf_base64">
+      <input type="hidden" name="assinatura_base64" id="assinatura_base64">
 
-      <!-- ETAPA 1 -->
       <section class="step active-step">
         <div class="card">
           <div class="card-header">1. Identificação</div>
           <div class="card-body">
-            <div class="logo-box">
-              <img src="logo-azulcargo.png" alt="Logo Azul Cargo">
-              <div class="muted">Preencha uma etapa por vez</div>
-            </div>
-            <div class="grid" style="margin-top:12px;">
+            <div class="grid">
               <div class="field">
                 <label for="numero_coleta">Nº da coleta</label>
                 <input id="numero_coleta" name="numero_coleta" type="text">
@@ -342,7 +278,6 @@
         </div>
       </section>
 
-      <!-- ETAPA 2 -->
       <section class="step">
         <div class="card">
           <div class="card-header">2. Pagamento de frete / tomador</div>
@@ -373,7 +308,6 @@
         </div>
       </section>
 
-      <!-- ETAPA 3 -->
       <section class="step">
         <div class="card">
           <div class="card-header">3. Forma de entrega</div>
@@ -381,17 +315,10 @@
             <div class="field">
               <label>Forma de entrega</label>
               <div class="radio-group">
-                <label class="radio-option">
-                  <input type="radio" name="forma_entrega" value="Entrega no endereço" onclick="toggleAero(false)">
-                  Entrega no endereço
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="forma_entrega" value="Retirada na unidade" onclick="toggleAero(true)">
-                  Retirada na unidade
-                </label>
+                <label class="radio-option"><input type="radio" name="forma_entrega" value="Entrega no endereço" onclick="toggleAero(false)">Entrega no endereço</label>
+                <label class="radio-option"><input type="radio" name="forma_entrega" value="Retirada na unidade" onclick="toggleAero(true)">Retirada na unidade</label>
               </div>
             </div>
-
             <div class="field" id="blocoAeroporto" style="display:none;">
               <label for="local_retirada">Local retirada</label>
               <input list="listaAero" id="local_retirada" name="local_retirada">
@@ -409,126 +336,59 @@
         </div>
       </section>
 
-      <!-- ETAPA 4 -->
       <section class="step">
         <div class="card">
           <div class="card-header">4. Remetente</div>
           <div class="card-body">
             <div class="grid">
-              <div class="field">
-                <label for="remetente_nome">Nome</label>
-                <input id="remetente_nome" name="remetente_nome" type="text">
-              </div>
-              <div class="field">
-                <label for="remetente_cpf_cnpj">CPF/CNPJ</label>
-                <input id="remetente_cpf_cnpj" class="cpf" name="remetente_cpf_cnpj" type="text">
-              </div>
-              <div class="field">
-                <label for="remetente_endereco">Endereço</label>
-                <input id="remetente_endereco" name="remetente_endereco" type="text">
-              </div>
-              <div class="field">
-                <label for="remetente_numero">Nº</label>
-                <input id="remetente_numero" name="remetente_numero" type="text">
-              </div>
-              <div class="field">
-                <label for="remetente_complemento">Complemento</label>
-                <input id="remetente_complemento" name="remetente_complemento" type="text">
-              </div>
-              <div class="field">
-                <label for="remetente_cidade">Cidade</label>
-                <input id="remetente_cidade" name="remetente_cidade" type="text">
-              </div>
-              <div class="field">
-                <label for="remetente_cep">CEP</label>
-                <input id="remetente_cep" class="cep" name="remetente_cep" type="text">
-              </div>
-              <div class="field">
-                <label for="remetente_telefone">Telefone</label>
-                <input id="remetente_telefone" name="remetente_telefone" type="text">
-              </div>
+              <div class="field"><label for="remetente_nome">Nome</label><input id="remetente_nome" name="remetente_nome" type="text"></div>
+              <div class="field"><label for="remetente_cpf_cnpj">CPF/CNPJ</label><input id="remetente_cpf_cnpj" class="cpf" name="remetente_cpf_cnpj" type="text"></div>
+              <div class="field"><label for="remetente_endereco">Endereço</label><input id="remetente_endereco" name="remetente_endereco" type="text"></div>
+              <div class="field"><label for="remetente_numero">Nº</label><input id="remetente_numero" name="remetente_numero" type="text"></div>
+              <div class="field"><label for="remetente_complemento">Complemento</label><input id="remetente_complemento" name="remetente_complemento" type="text"></div>
+              <div class="field"><label for="remetente_cidade">Cidade</label><input id="remetente_cidade" name="remetente_cidade" type="text"></div>
+              <div class="field"><label for="remetente_cep">CEP</label><input id="remetente_cep" class="cep" name="remetente_cep" type="text"></div>
+              <div class="field"><label for="remetente_telefone">Telefone</label><input id="remetente_telefone" name="remetente_telefone" type="text"></div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ETAPA 5 -->
       <section class="step">
         <div class="card">
           <div class="card-header">5. Destinatário</div>
           <div class="card-body">
             <div class="grid">
-              <div class="field">
-                <label for="destinatario_nome">Nome</label>
-                <input id="destinatario_nome" name="destinatario_nome" type="text">
-              </div>
-              <div class="field">
-                <label for="destinatario_cpf_cnpj">CPF/CNPJ</label>
-                <input id="destinatario_cpf_cnpj" class="cpf" name="destinatario_cpf_cnpj" type="text">
-              </div>
-              <div class="field">
-                <label for="destinatario_endereco">Endereço</label>
-                <input id="destinatario_endereco" name="destinatario_endereco" type="text">
-              </div>
-              <div class="field">
-                <label for="destinatario_numero">Nº</label>
-                <input id="destinatario_numero" name="destinatario_numero" type="text">
-              </div>
-              <div class="field">
-                <label for="destinatario_complemento">Complemento</label>
-                <input id="destinatario_complemento" name="destinatario_complemento" type="text">
-              </div>
-              <div class="field">
-                <label for="destinatario_cidade">Cidade</label>
-                <input id="destinatario_cidade" name="destinatario_cidade" type="text">
-              </div>
-              <div class="field">
-                <label for="destinatario_cep">CEP</label>
-                <input id="destinatario_cep" class="cep" name="destinatario_cep" type="text">
-              </div>
-              <div class="field">
-                <label for="destinatario_telefone">Telefone</label>
-                <input id="destinatario_telefone" name="destinatario_telefone" type="text">
-              </div>
+              <div class="field"><label for="destinatario_nome">Nome</label><input id="destinatario_nome" name="destinatario_nome" type="text"></div>
+              <div class="field"><label for="destinatario_cpf_cnpj">CPF/CNPJ</label><input id="destinatario_cpf_cnpj" class="cpf" name="destinatario_cpf_cnpj" type="text"></div>
+              <div class="field"><label for="destinatario_endereco">Endereço</label><input id="destinatario_endereco" name="destinatario_endereco" type="text"></div>
+              <div class="field"><label for="destinatario_numero">Nº</label><input id="destinatario_numero" name="destinatario_numero" type="text"></div>
+              <div class="field"><label for="destinatario_complemento">Complemento</label><input id="destinatario_complemento" name="destinatario_complemento" type="text"></div>
+              <div class="field"><label for="destinatario_cidade">Cidade</label><input id="destinatario_cidade" name="destinatario_cidade" type="text"></div>
+              <div class="field"><label for="destinatario_cep">CEP</label><input id="destinatario_cep" class="cep" name="destinatario_cep" type="text"></div>
+              <div class="field"><label for="destinatario_telefone">Telefone</label><input id="destinatario_telefone" name="destinatario_telefone" type="text"></div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ETAPA 6 -->
       <section class="step">
         <div class="card">
           <div class="card-header">6. Informações da carga</div>
           <div class="card-body">
             <div class="grid-3">
-              <div class="field">
-                <label for="volumes">Volumes</label>
-                <input id="volumes" name="volumes" type="text">
-              </div>
-              <div class="field">
-                <label for="peso_kg">Peso (kg)</label>
-                <input id="peso_kg" name="peso_kg" type="text">
-              </div>
-              <div class="field">
-                <label for="dimensoes">Dimensões</label>
-                <input id="dimensoes" name="dimensoes" type="text">
-              </div>
+              <div class="field"><label for="volumes">Volumes</label><input id="volumes" name="volumes" type="text"></div>
+              <div class="field"><label for="peso_kg">Peso (kg)</label><input id="peso_kg" name="peso_kg" type="text"></div>
+              <div class="field"><label for="dimensoes">Dimensões</label><input id="dimensoes" name="dimensoes" type="text"></div>
             </div>
             <div class="grid">
-              <div class="field">
-                <label for="tipo_embalagem">Tipo de embalagem</label>
-                <input id="tipo_embalagem" name="tipo_embalagem" type="text">
-              </div>
-              <div class="field">
-                <label for="descricao_carga">Descrição</label>
-                <input id="descricao_carga" name="descricao_carga" type="text">
-              </div>
+              <div class="field"><label for="tipo_embalagem">Tipo de embalagem</label><input id="tipo_embalagem" name="tipo_embalagem" type="text"></div>
+              <div class="field"><label for="descricao_carga">Descrição</label><input id="descricao_carga" name="descricao_carga" type="text"></div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ETAPA 7 -->
       <section class="step">
         <div class="card">
           <div class="card-header">7. Documentação</div>
@@ -546,7 +406,6 @@
                 <input id="valor_documento" class="money" name="valor_documento" type="text">
               </div>
             </div>
-
             <div class="grid-1" id="blocoNumeroNota" style="display:none;">
               <div class="field">
                 <label for="numero_nota_fiscal">Número da nota fiscal</label>
@@ -557,7 +416,6 @@
         </div>
       </section>
 
-      <!-- ETAPA 8 -->
       <section class="step">
         <div class="card">
           <div class="card-header">8. Declaração</div>
@@ -570,34 +428,20 @@
         </div>
       </section>
 
-      <!-- ETAPA 9 -->
       <section class="step">
         <div class="card">
           <div class="card-header">9. Responsável</div>
           <div class="card-body">
             <div class="grid">
-              <div class="field">
-                <label for="responsavel_local">Local</label>
-                <input id="responsavel_local" name="responsavel_local" type="text">
-              </div>
-              <div class="field">
-                <label for="responsavel_data">Data</label>
-                <input id="responsavel_data" class="data" name="responsavel_data" type="text">
-              </div>
-              <div class="field">
-                <label for="responsavel_rg">RG</label>
-                <input id="responsavel_rg" class="rg" name="responsavel_rg" type="text">
-              </div>
-              <div class="field">
-                <label for="responsavel_nome">Nome</label>
-                <input id="responsavel_nome" name="responsavel_nome" type="text">
-              </div>
+              <div class="field"><label for="responsavel_local">Local</label><input id="responsavel_local" name="responsavel_local" type="text"></div>
+              <div class="field"><label for="responsavel_data">Data</label><input id="responsavel_data" class="data" name="responsavel_data" type="text"></div>
+              <div class="field"><label for="responsavel_rg">RG</label><input id="responsavel_rg" class="rg" name="responsavel_rg" type="text"></div>
+              <div class="field"><label for="responsavel_nome">Nome</label><input id="responsavel_nome" name="responsavel_nome" type="text"></div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ETAPA 10 -->
       <section class="step">
         <div class="card">
           <div class="card-header">10. Observações finais</div>
@@ -610,10 +454,29 @@
         </div>
       </section>
 
-      <!-- ETAPA 11 -->
       <section class="step">
         <div class="card">
-          <div class="card-header">11. Revisão final</div>
+          <div class="card-header">11. Assinatura digital</div>
+          <div class="card-body">
+            <div class="field">
+              <label>Assinatura do responsável</label>
+              <div class="signature-wrap">
+                <div class="signature-toolbar">
+                  <span class="muted">Assine com dedo, mouse ou caneta</span>
+                  <button type="button" id="btnLimparAssinatura">Limpar assinatura</button>
+                </div>
+                <div class="signature-canvas-box">
+                  <canvas id="assinatura"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="card">
+          <div class="card-header">12. Revisão final</div>
           <div class="card-body">
             <div class="review-box" id="reviewBox"></div>
             <div id="statusBox" class="status-box"></div>
@@ -638,11 +501,12 @@
 
       if (ehMobileUA || ehTelaPequena) {
         document.body.classList.add("mobile-device");
+        document.getElementById("tipo_dispositivo").value = "MOBILE";
       } else {
         document.body.classList.remove("mobile-device");
+        document.getElementById("tipo_dispositivo").value = "DESKTOP";
       }
 
-      document.getElementById("tipo_dispositivo").value = (ehMobileUA || ehTelaPequena) ? "MOBILE" : "DESKTOP";
       document.getElementById("largura_tela").value = window.innerWidth || "";
       document.getElementById("altura_tela").value = window.innerHeight || "";
       document.getElementById("user_agent").value = navigator.userAgent || "";
@@ -651,6 +515,7 @@
     window.addEventListener("load", detectarCelular);
     window.addEventListener("resize", detectarCelular);
 
+    const form = document.getElementById("minutaForm");
     const steps = document.querySelectorAll(".step");
     const stepLabel = document.getElementById("wizardStepLabel");
     const btnVoltar = document.getElementById("btnVoltar");
@@ -659,7 +524,7 @@
     const btnEnviar = document.getElementById("btnEnviar");
     const reviewBox = document.getElementById("reviewBox");
     const statusBox = document.getElementById("statusBox");
-    const form = document.getElementById("minutaForm");
+
     let etapaAtual = 0;
 
     function mostrarStatus(tipo, texto) {
@@ -685,12 +550,10 @@
       btnPdf.style.display = ultima ? "block" : "none";
       btnEnviar.style.display = ultima ? "block" : "none";
 
-      if (ultima) {
-        montarRevisao();
-      }
+      if (ultima) montarRevisao();
 
-      window.scrollTo({ top: 0, behavior: "smooth" });
       limparStatus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     btnVoltar.addEventListener("click", () => {
@@ -707,10 +570,14 @@
       }
     });
 
+    function getRadioValue(name) {
+      const checked = document.querySelector(`input[name="${name}"]:checked`);
+      return checked ? checked.value : "";
+    }
+
     function toggleAero(show) {
       const bloco = document.getElementById("blocoAeroporto");
       const campo = document.getElementById("local_retirada");
-
       bloco.style.display = show ? "block" : "none";
       if (!show) campo.value = "";
     }
@@ -734,7 +601,7 @@
 
     document.querySelectorAll(".cep").forEach(el => {
       el.addEventListener("input", () => {
-        let v = el.value.replace(/\D/g, '').slice(0, 8);
+        let v = el.value.replace(/\D/g, "").slice(0, 8);
         v = v.replace(/(\d{5})(\d)/, "$1-$2");
         el.value = v;
       });
@@ -742,7 +609,7 @@
 
     document.querySelectorAll(".cpf").forEach(el => {
       el.addEventListener("input", () => {
-        let v = el.value.replace(/\D/g, '');
+        let v = el.value.replace(/\D/g, "");
         if (v.length <= 11) {
           v = v.replace(/(\d{3})(\d)/, "$1.$2");
           v = v.replace(/(\d{3})(\d)/, "$1.$2");
@@ -760,7 +627,7 @@
 
     document.querySelectorAll(".rg").forEach(el => {
       el.addEventListener("input", () => {
-        let v = el.value.replace(/\D/g, '').slice(0, 9);
+        let v = el.value.replace(/\D/g, "").slice(0, 9);
         v = v.replace(/(\d{2})(\d)/, "$1.$2");
         v = v.replace(/(\d{3})(\d)/, "$1.$2");
         v = v.replace(/(\d{3})(\d)/, "$1-$2");
@@ -770,7 +637,7 @@
 
     document.querySelectorAll(".data").forEach(el => {
       el.addEventListener("input", () => {
-        let v = el.value.replace(/\D/g, '').slice(0, 8);
+        let v = el.value.replace(/\D/g, "").slice(0, 8);
         v = v.replace(/(\d{2})(\d)/, "$1/$2");
         v = v.replace(/(\d{2})(\d)/, "$1/$2");
         el.value = v;
@@ -779,7 +646,7 @@
 
     document.querySelectorAll(".money").forEach(el => {
       el.addEventListener("input", () => {
-        let v = el.value.replace(/\D/g, '');
+        let v = el.value.replace(/\D/g, "");
         if (!v) {
           el.value = "";
           return;
@@ -808,11 +675,7 @@
 
     radiosFrete.forEach(r => r.addEventListener("change", atualizarEstadoFrete));
     atualizarEstadoFrete();
-
-    function getRadioValue(name) {
-      const checked = document.querySelector(`input[name="${name}"]:checked`);
-      return checked ? checked.value : "";
-    }
+    toggleNumeroNotaFiscal();
 
     function coletarDados() {
       const formData = new FormData(form);
@@ -833,7 +696,6 @@
 
     function montarRevisao() {
       const d = coletarDados();
-
       const texto = [
         `Nº coleta: ${d.numero_coleta || ""}`,
         `Tipo de serviço: ${d.tipo_servico || ""}`,
@@ -885,82 +747,379 @@
       reviewBox.textContent = texto;
     }
 
-    async function gerarPdfBase64() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit: "mm", format: "a4" });
-      const d = coletarDados();
+    const assinaturaCanvas = document.getElementById("assinatura");
+    const assinaturaInput = document.getElementById("assinatura_base64");
+    const btnLimparAssinatura = document.getElementById("btnLimparAssinatura");
+    const assinaturaCtx = assinaturaCanvas.getContext("2d");
+    let assinando = false;
 
-      const linhas = [
-        "MINUTA DE DESPACHO DE CARGA",
-        "",
-        `Nº DA COLETA: ${d.numero_coleta || ""}`,
-        `TIPO DE SERVIÇO: ${d.tipo_servico || ""}`,
-        `PAGAMENTO DE FRETE: ${d.frete || ""}`,
-        `TOMADOR: ${d.tomador || ""}`,
-        `CNPJ TOMADOR: ${d.cnpj_frete || ""}`,
-        `FORMA DE ENTREGA: ${d.forma_entrega || ""}`,
-        `LOCAL RETIRADA: ${d.local_retirada || ""}`,
-        "",
-        "REMETENTE",
-        `Nome: ${d.remetente_nome || ""}`,
-        `CPF/CNPJ: ${d.remetente_cpf_cnpj || ""}`,
-        `Endereço: ${d.remetente_endereco || ""}, ${d.remetente_numero || ""}`,
-        `Complemento: ${d.remetente_complemento || ""}`,
-        `Cidade: ${d.remetente_cidade || ""}`,
-        `CEP: ${d.remetente_cep || ""}`,
-        `Telefone: ${d.remetente_telefone || ""}`,
-        "",
-        "DESTINATÁRIO",
-        `Nome: ${d.destinatario_nome || ""}`,
-        `CPF/CNPJ: ${d.destinatario_cpf_cnpj || ""}`,
-        `Endereço: ${d.destinatario_endereco || ""}, ${d.destinatario_numero || ""}`,
-        `Complemento: ${d.destinatario_complemento || ""}`,
-        `Cidade: ${d.destinatario_cidade || ""}`,
-        `CEP: ${d.destinatario_cep || ""}`,
-        `Telefone: ${d.destinatario_telefone || ""}`,
-        "",
-        "INFORMAÇÕES DA CARGA",
-        `Volumes: ${d.volumes || ""}`,
-        `Peso (kg): ${d.peso_kg || ""}`,
-        `Dimensões: ${d.dimensoes || ""}`,
-        `Tipo embalagem: ${d.tipo_embalagem || ""}`,
-        `Descrição: ${d.descricao_carga || ""}`,
-        "",
-        "DOCUMENTAÇÃO",
-        `Tipo: ${d.tipo_documento || ""}`,
-        `Valor: ${d.valor_documento || ""}`,
-        `Número NF: ${d.numero_nota_fiscal || ""}`,
-        "",
-        "DECLARAÇÃO",
-        d.declaracao_texto || "",
-        "",
-        "RESPONSÁVEL",
-        `Local: ${d.responsavel_local || ""}`,
-        `Data: ${d.responsavel_data || ""}`,
-        `RG: ${d.responsavel_rg || ""}`,
-        `Nome: ${d.responsavel_nome || ""}`,
-        "",
-        `Observações: ${d.observacoes || ""}`
-      ];
+    function ajustarCanvasAssinatura() {
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      const rect = assinaturaCanvas.getBoundingClientRect();
+      assinaturaCanvas.width = rect.width * ratio;
+      assinaturaCanvas.height = rect.height * ratio;
+      assinaturaCtx.setTransform(1, 0, 0, 1, 0, 0);
+      assinaturaCtx.scale(ratio, ratio);
+      assinaturaCtx.lineWidth = 2;
+      assinaturaCtx.lineCap = "round";
+      assinaturaCtx.strokeStyle = "#000000";
+      assinaturaCtx.fillStyle = "#ffffff";
+      assinaturaCtx.fillRect(0, 0, rect.width, rect.height);
+    }
 
-      let y = 12;
+    function getPos(evt) {
+      const rect = assinaturaCanvas.getBoundingClientRect();
+      if (evt.touches && evt.touches[0]) {
+        return {
+          x: evt.touches[0].clientX - rect.left,
+          y: evt.touches[0].clientY - rect.top
+        };
+      }
+      return {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
+      };
+    }
+
+    function iniciarAssinatura(evt) {
+      evt.preventDefault();
+      assinando = true;
+      const pos = getPos(evt);
+      assinaturaCtx.beginPath();
+      assinaturaCtx.moveTo(pos.x, pos.y);
+    }
+
+    function moverAssinatura(evt) {
+      if (!assinando) return;
+      evt.preventDefault();
+      const pos = getPos(evt);
+      assinaturaCtx.lineTo(pos.x, pos.y);
+      assinaturaCtx.stroke();
+    }
+
+    function finalizarAssinatura(evt) {
+      if (!assinando) return;
+      evt.preventDefault();
+      assinando = false;
+      assinaturaCtx.beginPath();
+      assinaturaInput.value = assinaturaCanvas.toDataURL("image/png");
+    }
+
+    btnLimparAssinatura.addEventListener("click", () => {
+      ajustarCanvasAssinatura();
+      assinaturaInput.value = "";
+    });
+
+    assinaturaCanvas.addEventListener("mousedown", iniciarAssinatura);
+    assinaturaCanvas.addEventListener("mousemove", moverAssinatura);
+    assinaturaCanvas.addEventListener("mouseup", finalizarAssinatura);
+    assinaturaCanvas.addEventListener("mouseleave", finalizarAssinatura);
+
+    assinaturaCanvas.addEventListener("touchstart", iniciarAssinatura, { passive: false });
+    assinaturaCanvas.addEventListener("touchmove", moverAssinatura, { passive: false });
+    assinaturaCanvas.addEventListener("touchend", finalizarAssinatura, { passive: false });
+
+    window.addEventListener("load", ajustarCanvasAssinatura);
+    window.addEventListener("resize", ajustarCanvasAssinatura);
+
+    function drawFilledRect(doc, x, y, w, h, color) {
+      doc.setFillColor(color[0], color[1], color[2]);
+      doc.rect(x, y, w, h, "F");
+    }
+
+    function drawBorder(doc, x, y, w, h, width = 0.2) {
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(width);
+      doc.rect(x, y, w, h);
+    }
+
+    function drawHeaderBar(doc, text, x, y, w, h) {
+      drawFilledRect(doc, x, y, w, h, [11, 45, 92]);
+      drawBorder(doc, x, y, w, h);
+      doc.setTextColor(255, 255, 255);
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(14);
-      doc.text("MINUTA DE DESPACHO DE CARGA", 10, y);
-      y += 8;
+      doc.setFontSize(8.5);
+      doc.text(text, x + 1.5, y + h - 1.8);
+      doc.setTextColor(0, 0, 0);
+    }
+
+    function drawFieldCell(doc, x, y, w, h, label, value, labelWidth = null) {
+      drawBorder(doc, x, y, w, h);
+      if (labelWidth === null) labelWidth = Math.min(38, w * 0.35);
 
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
+      doc.setFontSize(7.5);
+      doc.text(label, x + 1.5, y + 4.2);
 
-      linhas.slice(2).forEach((linha) => {
-        const quebradas = doc.splitTextToSize(linha, 190);
-        if (y + quebradas.length * 5 > 285) {
-          doc.addPage();
-          y = 12;
+      const fieldX = x + labelWidth;
+      const fieldW = w - labelWidth - 1.2;
+
+      if (fieldW > 2) {
+        doc.setFillColor(220, 230, 241);
+        doc.rect(fieldX, y + 1, fieldW, h - 2, "F");
+      }
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      const safeValue = value || "";
+      const textLines = doc.splitTextToSize(String(safeValue), Math.max(5, fieldW - 2));
+      doc.text(textLines.slice(0, 2), fieldX + 1.2, y + 4.2);
+    }
+
+    function drawSimpleField(doc, x, y, w, h, value) {
+      drawBorder(doc, x, y, w, h);
+      doc.setFillColor(220, 230, 241);
+      doc.rect(x + 1, y + 1, w - 2, h - 2, "F");
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      const lines = doc.splitTextToSize(String(value || ""), Math.max(5, w - 4));
+      doc.text(lines.slice(0, 2), x + 2, y + 4.2);
+    }
+
+    function drawCheckboxLine(doc, x, y, w, text, checked, valueText = "") {
+      drawBorder(doc, x, y, w, 7);
+      doc.circle(x + 3, y + 3.5, 1.5);
+      if (checked) {
+        doc.setFillColor(11, 45, 92);
+        doc.circle(x + 3, y + 3.5, 0.8, "F");
+      }
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.text(text, x + 6, y + 4.2);
+      if (valueText) {
+        doc.setFillColor(220, 230, 241);
+        doc.rect(x + w - 75, y + 1, 73, 5, "F");
+        const lines = doc.splitTextToSize(String(valueText), 68);
+        doc.text(lines.slice(0, 1), x + w - 73, y + 4.2);
+      }
+    }
+
+    async function gerarPdfBase64() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF("p", "mm", "a4");
+      const d = coletarDados();
+
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.2);
+
+      const pageX = 10;
+      const pageW = 190;
+      let y = 10;
+
+      drawBorder(doc, pageX, y, 55, 14);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.setTextColor(11, 45, 92);
+      doc.text("Azulcargo", pageX + 16, y + 5.5);
+      doc.setFontSize(13);
+      doc.text("Express", pageX + 16, y + 11.2);
+      doc.setLineWidth(1.2);
+      doc.line(pageX + 5, y + 3, pageX + 7.5, y + 7);
+      doc.line(pageX + 7.5, y + 7, pageX + 5, y + 11);
+      doc.line(pageX + 9.5, y + 3, pageX + 12, y + 7);
+      doc.line(pageX + 12, y + 7, pageX + 9.5, y + 11);
+      doc.setLineWidth(0.2);
+
+      drawBorder(doc, pageX + 55, y, 58, 14);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      doc.text("MINUTA DE DESPACHO DE CARGA", pageX + 58, y + 8);
+
+      drawBorder(doc, pageX + 113, y, 77, 14);
+      doc.setFontSize(8.5);
+      doc.text("Nº DA COLETA", pageX + 115, y + 4.5);
+      doc.setFillColor(220, 230, 241);
+      doc.rect(pageX + 114.5, y + 6, 73, 5.5, "F");
+      doc.text(String(d.numero_coleta || ""), pageX + 116, y + 10);
+
+      y += 14;
+
+      drawHeaderBar(doc, "1. TIPO DE SERVIÇO", pageX, y, pageW, 6);
+      y += 6;
+
+      const servCols = [47.5, 47.5, 47.5, 47.5];
+      const servTexts = ["Expresso", "Premium", "Ecommerce", "Standard"];
+      const servVals = ["Expresso", "Premium", "Ecommerce", "Standard"];
+      let sx = pageX;
+      for (let i = 0; i < servCols.length; i++) {
+        drawBorder(doc, sx, y, servCols[i], 7);
+        doc.circle(sx + 4, y + 3.5, 1.5);
+        if (d.tipo_servico === servVals[i]) {
+          doc.setFillColor(11, 45, 92);
+          doc.circle(sx + 4, y + 3.5, 0.8, "F");
         }
-        doc.text(quebradas, 10, y);
-        y += quebradas.length * 5 + 1;
-      });
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7.5);
+        doc.text(servTexts[i], sx + 8, y + 4.2);
+        sx += servCols[i];
+      }
+      y += 7;
+
+      drawHeaderBar(doc, "2. PAGAMENTO DE FRETE / TOMADOR", pageX, y, pageW, 6);
+      y += 6;
+
+      drawBorder(doc, pageX, y, 112, 14);
+      drawBorder(doc, pageX + 112, y, 78, 14);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.text("Pagamento de Frete", pageX + 1.5, y + 4.2);
+
+      doc.circle(pageX + 41, y + 3.5, 1.5);
+      if (d.frete === "Pago na origem") {
+        doc.setFillColor(11, 45, 92);
+        doc.circle(pageX + 41, y + 3.5, 0.8, "F");
+      }
+      doc.text("Pago na origem", pageX + 45, y + 4.2);
+
+      doc.circle(pageX + 41, y + 9.8, 1.5);
+      if (d.frete === "Cliente correntista") {
+        doc.setFillColor(11, 45, 92);
+        doc.circle(pageX + 41, y + 9.8, 0.8, "F");
+      }
+      doc.text("Cliente correntista", pageX + 45, y + 10.5);
+
+      doc.text("Tomador", pageX + 114, y + 4.2);
+      doc.circle(pageX + 134, y + 3.5, 1.5);
+      if (d.tomador === "Remetente") {
+        doc.setFillColor(11, 45, 92);
+        doc.circle(pageX + 134, y + 3.5, 0.8, "F");
+      }
+      doc.text("Remetente", pageX + 138, y + 4.2);
+
+      doc.circle(pageX + 134, y + 9.8, 1.5);
+      if (d.tomador === "Destinatário") {
+        doc.setFillColor(11, 45, 92);
+        doc.circle(pageX + 134, y + 9.8, 0.8, "F");
+      }
+      doc.text("Destinatário", pageX + 138, y + 10.5);
+
+      y += 14;
+
+      drawFieldCell(doc, pageX, y, pageW, 7, "CNPJ do Tomador", d.cnpj_frete || "", 38);
+      y += 7;
+
+      drawHeaderBar(doc, "3. FORMA DE ENTREGA", pageX, y, pageW, 6);
+      y += 6;
+
+      drawBorder(doc, pageX, y, pageW, 7);
+      doc.circle(pageX + 31, y + 3.5, 1.5);
+      if (d.forma_entrega === "Entrega no endereço") {
+        doc.setFillColor(11, 45, 92);
+        doc.circle(pageX + 31, y + 3.5, 0.8, "F");
+      }
+      doc.text("Entrega no endereço", pageX + 35, y + 4.2);
+
+      doc.circle(pageX + 78, y + 3.5, 1.5);
+      if (d.forma_entrega === "Retirada na unidade") {
+        doc.setFillColor(11, 45, 92);
+        doc.circle(pageX + 78, y + 3.5, 0.8, "F");
+      }
+      doc.text("Retirada na unidade", pageX + 82, y + 4.2);
+
+      if (d.local_retirada) {
+        doc.text(`Local: ${d.local_retirada}`, pageX + 132, y + 4.2);
+      }
+      y += 7;
+
+      drawHeaderBar(doc, "REMETENTE", pageX, y, 95, 6);
+      drawHeaderBar(doc, "DESTINATÁRIO", pageX + 95, y, 95, 6);
+      y += 6;
+
+      const rowH = 7;
+      const leftX = pageX;
+      const rightX = pageX + 95;
+
+      drawFieldCell(doc, leftX, y, 95, rowH, "Nome", d.remetente_nome || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "Nome", d.destinatario_nome || "", 22);
+      y += rowH;
+
+      drawFieldCell(doc, leftX, y, 95, rowH, "CPF/CNPJ", d.remetente_cpf_cnpj || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "CPF/CNPJ", d.destinatario_cpf_cnpj || "", 22);
+      y += rowH;
+
+      drawFieldCell(doc, leftX, y, 95, rowH, "Endereço", d.remetente_endereco || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "Endereço", d.destinatario_endereco || "", 22);
+      y += rowH;
+
+      drawFieldCell(doc, leftX, y, 95, rowH, "Nº", d.remetente_numero || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "Nº", d.destinatario_numero || "", 22);
+      y += rowH;
+
+      drawFieldCell(doc, leftX, y, 95, rowH, "Compl.", d.remetente_complemento || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "Compl.", d.destinatario_complemento || "", 22);
+      y += rowH;
+
+      drawFieldCell(doc, leftX, y, 95, rowH, "Cidade", d.remetente_cidade || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "Cidade", d.destinatario_cidade || "", 22);
+      y += rowH;
+
+      drawFieldCell(doc, leftX, y, 95, rowH, "CEP", d.remetente_cep || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "CEP", d.destinatario_cep || "", 22);
+      y += rowH;
+
+      drawFieldCell(doc, leftX, y, 95, rowH, "Telefone", d.remetente_telefone || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "Telefone", d.destinatario_telefone || "", 22);
+      y += rowH;
+
+      drawHeaderBar(doc, "INFORMAÇÕES DA CARGA", pageX, y, pageW, 6);
+      y += 6;
+
+      drawFieldCell(doc, pageX, y, 70, 8, "Volumes", d.volumes || "", 20);
+      drawFieldCell(doc, pageX + 70, y, 60, 8, "Peso\n(kg)", d.peso_kg || "", 16);
+      drawFieldCell(doc, pageX + 130, y, 60, 8, "Dimensões", d.dimensoes || "", 18);
+      y += 8;
+
+      drawFieldCell(doc, pageX, y, 84, 8, "Tipo de\nembalagem", d.tipo_embalagem || "", 22);
+      drawFieldCell(doc, pageX + 84, y, 106, 8, "Descrição", d.descricao_carga || "", 18);
+      y += 8;
+
+      drawHeaderBar(doc, "DOCUMENTAÇÃO", pageX, y, pageW, 6);
+      y += 6;
+
+      drawCheckboxLine(doc, pageX, y, pageW, "Nota fiscal - Valor (R$)", d.tipo_documento === "Nota fiscal", d.tipo_documento === "Nota fiscal" ? d.valor_documento : "");
+      y += 7;
+      drawCheckboxLine(doc, pageX, y, pageW, "Declaração de conteúdo - Valor declarado (R$)", d.tipo_documento === "Declaração de conteúdo", d.tipo_documento === "Declaração de conteúdo" ? d.valor_documento : "");
+      y += 7;
+
+      if (d.numero_nota_fiscal) {
+        drawFieldCell(doc, pageX, y, pageW, 7, "Número da nota fiscal", d.numero_nota_fiscal || "", 42);
+        y += 7;
+      }
+
+      drawHeaderBar(doc, "DECLARAÇÃO", pageX, y, pageW, 6);
+      y += 6;
+
+      const declaracaoH = 26;
+      drawBorder(doc, pageX, y, pageW, declaracaoH);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(5.8);
+      const declaracaoTexto = doc.splitTextToSize(String(d.declaracao_texto || ""), 186);
+      doc.text(declaracaoTexto.slice(0, 10), pageX + 1.5, y + 3.8);
+      y += declaracaoH;
+
+      drawHeaderBar(doc, "RESPONSÁVEL", pageX, y, pageW, 6);
+      y += 6;
+
+      drawFieldCell(doc, pageX, y, 55, 8, "Local", d.responsavel_local || "", 14);
+      drawFieldCell(doc, pageX + 55, y, 45, 8, "Data", d.responsavel_data || "", 14);
+      drawFieldCell(doc, pageX + 100, y, 90, 8, "Nome", d.responsavel_nome || "", 14);
+      y += 8;
+
+      drawFieldCell(doc, pageX, y, 55, 8, "RG", d.responsavel_rg || "", 14);
+
+      drawBorder(doc, pageX + 55, y, 135, 24);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.text("Assinatura", pageX + 57, y + 4);
+
+      const assinaturaBase64 = assinaturaInput.value || "";
+      if (assinaturaBase64) {
+        try {
+          doc.addImage(assinaturaBase64, "PNG", pageX + 58, y + 5, 60, 16);
+        } catch (e) {}
+      }
 
       const arrayBuffer = doc.output("arraybuffer");
       const bytes = new Uint8Array(arrayBuffer);
@@ -969,7 +1128,9 @@
         binary += String.fromCharCode(bytes[i]);
       }
       const base64 = btoa(binary);
+
       document.getElementById("pdf_base64").value = base64;
+
       return { doc, base64 };
     }
 
@@ -988,6 +1149,7 @@
         const { base64 } = await gerarPdfBase64();
         const payload = coletarDados();
         payload.pdf_base64 = base64;
+        payload.assinatura_base64 = assinaturaInput.value || "";
 
         const response = await fetch("/api/minutas", {
           method: "POST",
@@ -1007,7 +1169,6 @@
       }
     });
 
-    toggleNumeroNotaFiscal();
     mostrarEtapa(etapaAtual);
   </script>
 </body>
