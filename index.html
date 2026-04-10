@@ -25,19 +25,19 @@ padding:10px;
 
 .page{
 width:210mm;
-height:297mm;
+min-height:297mm;
 margin:auto;
 background:#fff;
 padding:5mm;
 box-sizing:border-box;
 }
 
-/* TABELAS */
 table{
 width:100%;
 border-collapse:collapse;
 font-size:12px;
 table-layout:fixed;
+margin-bottom:10px;
 }
 
 td{
@@ -53,14 +53,17 @@ color:#fff;
 font-weight:bold;
 }
 
-input:not([type="radio"]){
+input:not([type="radio"]),
+select,
+textarea{
 width:100%;
 border:none;
 background:#dbe5f1;
 font-weight:bold;
-height:18px;
+min-height:30px;
 outline:none;
 box-sizing:border-box;
+padding:4px 6px;
 }
 
 input[type="radio"]{
@@ -96,22 +99,61 @@ width:10%;
 width:100%;
 }
 
-button{
-width:100%;
-padding:10px;
-background:#0b2d5c;
-color:#fff;
-border:none;
-margin-top:5px;
-cursor:pointer;
-}
-
 img{
 max-width:100%;
 height:auto;
 }
 
-/* MOBILE EXPANSIVO SEM QUEBRAR A ESTRUTURA */
+.step{
+display:none;
+}
+
+.step.active-step{
+display:block;
+}
+
+.wizard-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:10px;
+gap:10px;
+}
+
+.wizard-badge{
+background:#0b2d5c;
+color:#fff;
+padding:8px 12px;
+font-size:12px;
+font-weight:bold;
+border-radius:6px;
+}
+
+.wizard-nav{
+display:flex;
+gap:10px;
+margin-top:14px;
+}
+
+.wizard-nav button{
+width:100%;
+padding:12px;
+background:#0b2d5c;
+color:#fff;
+border:none;
+font-size:16px;
+cursor:pointer;
+}
+
+#btnPdf{
+display:none;
+}
+
+button{
+border:none;
+}
+
+/* MOBILE */
 body.mobile-device{
 padding:0;
 background:#fff;
@@ -119,52 +161,54 @@ background:#fff;
 
 body.mobile-device .page{
 width:100%;
-height:auto;
 min-height:auto;
 margin:0;
-padding:8px;
-box-sizing:border-box;
-overflow-x:auto;
+padding:10px;
+overflow-x:hidden;
 }
 
 body.mobile-device table{
-width:100%;
-min-width:680px;
-border-collapse:collapse;
-font-size:11px;
-table-layout:fixed;
+font-size:12px;
 }
 
 body.mobile-device td{
-padding:4px;
+display:block;
+width:100% !important;
 }
 
-body.mobile-device input:not([type="radio"]){
-min-height:38px;
+body.mobile-device tr{
+display:block;
+margin-bottom:6px;
+}
+
+body.mobile-device input:not([type="radio"]),
+body.mobile-device select,
+body.mobile-device textarea{
+min-height:42px;
 font-size:16px;
-padding:4px 6px;
 }
 
 body.mobile-device .frete-opcao{
-display:inline-flex;
-align-items:center;
-margin-right:16px;
-margin-bottom:6px;
-white-space:nowrap;
+display:flex;
+margin-right:0;
+margin-bottom:8px;
+white-space:normal;
 }
 
-body.mobile-device button{
-min-height:46px;
-font-size:16px;
+body.mobile-device .wizard-nav{
+position:sticky;
+bottom:0;
+background:#fff;
+padding-top:10px;
 }
 
-body.mobile-device #aero input{
-min-height:38px;
+body.mobile-device .wizard-top{
+flex-direction:column;
+align-items:flex-start;
 }
 
-/* IMPRESSÃO CORRETA */
+/* IMPRESSÃO */
 @media print{
-
 body{
 -webkit-print-color-adjust: exact;
 print-color-adjust: exact;
@@ -177,17 +221,24 @@ background:#0b2d5c !important;
 color:#fff !important;
 }
 
-input{
+input, select, textarea{
 background:#dbe5f1 !important;
 color:#000 !important;
 }
 
-button{display:none;}
+.wizard-top,
+.wizard-nav{
+display:none !important;
+}
+
+.step{
+display:block !important;
+}
 
 .page{
 margin:0;
 width:210mm;
-height:297mm;
+min-height:297mm;
 padding:5mm;
 overflow:visible;
 }
@@ -199,287 +250,366 @@ overflow:visible;
 
 <div class="page">
 
-<table>
-<tr>
-<td style="width:30%"><img src="logo-azulcargo.png" style="height:55px;"></td>
-<td style="text-align:center"><b>MINUTA DE DESPACHO DE CARGA</b></td>
-<td><b>Nº DA COLETA</b><input></td>
-</tr>
-</table>
+<div class="wizard-top">
+  <div class="wizard-badge" id="wizardStepLabel">Etapa 1 de 8</div>
+</div>
 
-<table>
-<tr><td colspan="8" class="header">1. TIPO DE SERVIÇO</td></tr>
-<tr>
-<td><input type="radio" name="serv"></td><td>Expresso</td>
-<td><input type="radio" name="serv"></td><td>Premium</td>
-<td><input type="radio" name="serv"></td><td>Ecommerce</td>
-<td><input type="radio" name="serv"></td><td>Standard</td>
-</tr>
-</table>
-
-<table>
+<!-- ETAPA 1 -->
+<div class="step active-step">
+  <table>
     <tr>
-        <td colspan="8" class="header">2. PAGAMENTO DE FRETE / TOMADOR</td>
+      <td style="width:30%"><img src="logo-azulcargo.png" style="height:55px;"></td>
+      <td style="text-align:center"><b>MINUTA DE DESPACHO DE CARGA</b></td>
+      <td><b>Nº DA COLETA</b><input></td>
+    </tr>
+  </table>
+
+  <table>
+    <tr><td colspan="8" class="header">1. TIPO DE SERVIÇO</td></tr>
+    <tr>
+      <td><input type="radio" name="serv"></td><td>Expresso</td>
+      <td><input type="radio" name="serv"></td><td>Premium</td>
+      <td><input type="radio" name="serv"></td><td>Ecommerce</td>
+      <td><input type="radio" name="serv"></td><td>Standard</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ETAPA 2 -->
+<div class="step">
+  <table>
+    <tr>
+      <td colspan="8" class="header">2. PAGAMENTO DE FRETE / TOMADOR</td>
     </tr>
     <tr>
-        <td class="campo-frete-label">Pagamento de Frete</td>
-        <td colspan="3" style="padding-left:10px;">
-            <label class="frete-opcao">
-                <input type="radio" name="frete" value="Pago na origem" checked>
-                Pago na origem
-            </label>
-            <label class="frete-opcao">
-                <input type="radio" name="frete" value="Cliente correntista">
-                Cliente correntista
-            </label>
-        </td>
-        <td class="campo-tomador-label">Tomador</td>
-        <td colspan="3" style="padding-left:10px;">
-            <label class="frete-opcao">
-                <input type="radio" name="tomador" value="Remetente">
-                Remetente
-            </label>
-            <label class="frete-opcao">
-                <input type="radio" name="tomador" value="Destinatário">
-                Destinatário
-            </label>
-        </td>
+      <td class="campo-frete-label">Pagamento de Frete</td>
+      <td colspan="3" style="padding-left:10px;">
+        <label class="frete-opcao">
+          <input type="radio" name="frete" value="Pago na origem" checked>
+          Pago na origem
+        </label>
+        <label class="frete-opcao">
+          <input type="radio" name="frete" value="Cliente correntista">
+          Cliente correntista
+        </label>
+      </td>
+      <td class="campo-tomador-label">Tomador</td>
+      <td colspan="3" style="padding-left:10px;">
+        <label class="frete-opcao">
+          <input type="radio" name="tomador" value="Remetente">
+          Remetente
+        </label>
+        <label class="frete-opcao">
+          <input type="radio" name="tomador" value="Destinatário">
+          Destinatário
+        </label>
+      </td>
     </tr>
     <tr>
-        <td>CNPJ do Tomador</td>
-        <td colspan="7">
-            <input class="cpf cnpj-tomador-input" name="cnpj_frete" maxlength="18" placeholder="00.000.000/0000-00">
-        </td>
+      <td>CNPJ do Tomador</td>
+      <td colspan="7">
+        <input class="cpf cnpj-tomador-input" name="cnpj_frete" maxlength="18" placeholder="00.000.000/0000-00">
+      </td>
     </tr>
-</table>
+  </table>
+</div>
 
-<table>
-<tr>
-<td colspan="8" class="header">3. FORMA DE ENTREGA</td>
-</tr>
-<tr>
-<td style="width:20%;">&nbsp;</td>
-<td colspan="7" style="padding-left:10px;">
-<label class="frete-opcao">
-    <input type="radio" name="forma_entrega" value="Entrega no endereço" onclick="toggleAero(false)">
-    Entrega no endereço
-</label>
+<!-- ETAPA 3 -->
+<div class="step">
+  <table>
+    <tr>
+      <td colspan="8" class="header">3. FORMA DE ENTREGA</td>
+    </tr>
+    <tr>
+      <td style="width:20%;">&nbsp;</td>
+      <td colspan="7" style="padding-left:10px;">
+        <label class="frete-opcao">
+          <input type="radio" name="forma_entrega" value="Entrega no endereço" onclick="toggleAero(false)">
+          Entrega no endereço
+        </label>
 
-<label class="frete-opcao">
-    <input type="radio" name="forma_entrega" value="Retirada na unidade" id="retiradaUnidade" onclick="toggleAero(true)">
-    Retirada na unidade
-</label>
-</td>
-</tr>
+        <label class="frete-opcao">
+          <input type="radio" name="forma_entrega" value="Retirada na unidade" id="retiradaUnidade" onclick="toggleAero(true)">
+          Retirada na unidade
+        </label>
+      </td>
+    </tr>
 
-<tr id="aero" style="display:none;">
-<td>Local retirada</td>
-<td colspan="7">
-<input list="listaAero" id="campoAeroporto">
-<datalist id="listaAero">
-<option value="AAX"><option value="AFL"><option value="AFLH1"><option value="AIF01">
-<option value="AIR"><option value="AJA02"><option value="AJU"><option value="ANA01">
-<option value="APD01"><option value="APQ01"><option value="APS02"><option value="APS03">
-<option value="AQA"><option value="ARM01"><option value="ARU"><option value="ATM">
-<option value="AXE01"><option value="BAC01"><option value="BEL"><option value="BELT1">
-<option value="BFH"><option value="BGV03"><option value="BHZ01"><option value="BHZ04">
-<option value="BHZ05"><option value="BNU02"><option value="BPG"><option value="BPS">
-<option value="BRA"><option value="BSB"><option value="BSB01"><option value="BSB02">
-<option value="BSB04"><option value="BVB"><option value="BVH"><option value="BVJ01">
-<option value="BVS"><option value="CAC"><option value="CAC01"><option value="CAU">
-<option value="CAU01"><option value="CAW01"><option value="CAX"><option value="CBA">
-<option value="CBW"><option value="CCI01"><option value="CDSP1"><option value="CDSP2">
-<option value="CDSP3"><option value="CDSP4"><option value="CEL"><option value="CFB">
-<option value="CGB"><option value="CGB04"><option value="CGB05"><option value="CGBT2">
-<option value="CGH"><option value="CGR"><option value="CGR01"><option value="CGRT1">
-<option value="CIZ"><option value="CKS"><option value="CLV"><option value="CMG">
-<option value="CNF"><option value="CNFT1"><option value="CPQ05"><option value="CPV">
-<option value="CSG01"><option value="CSU"><option value="CTG02"><option value="CWB">
-<option value="CWB05"><option value="CWBT1"><option value="CWBT2"><option value="CXJ">
-<option value="CXJ03"><option value="DIQ"><option value="DOU"><option value="DOUT1">
-<option value="DSO01"><option value="ERM"><option value="FEC"><option value="FEN">
-<option value="FLN"><option value="FLN01"><option value="FLNT2"><option value="FOR">
-<option value="FOR07"><option value="FORH8"><option value="FRC"><option value="GEL">
-<option value="GGB"><option value="GIG"><option value="GNM02"><option value="GPB">
-<option value="GRU"><option value="GRU03"><option value="GRUT1"><option value="GUI01">
-<option value="GVR"><option value="GXP01"><option value="GYN"><option value="HTA01">
-<option value="IDT01"><option value="IGU"><option value="IGU01"><option value="IJU02">
-<option value="IMP"><option value="IOS"><option value="IPN"><option value="ITB">
-<option value="ITG01"><option value="ITR01"><option value="IZA"><option value="JAC02">
-<option value="JAU02"><option value="JDO"><option value="JDR"><option value="JIA">
-<option value="JJD"><option value="JJG"><option value="JOI"><option value="JPA">
-<option value="JPA01"><option value="JPA04"><option value="JPE"><option value="JPO">
-<option value="JPR"><option value="JTC"><option value="JTN01"><option value="JUU01">
-<option value="LAJ01"><option value="LAZ"><option value="LDB"><option value="LDBT1">
-<option value="LFR02"><option value="LHNT1"><option value="LVR01"><option value="MAB">
-<option value="MAO"><option value="MAO01"><option value="MCP"><option value="MCZ">
-<option value="MCZH1"><option value="MEA"><option value="MEU"><option value="MGF">
-<option value="MII"><option value="MMA01"><option value="MMM01"><option value="MOC">
-<option value="MVF"><option value="NAT"><option value="NAT01"><option value="NIT03">
-<option value="NNS01"><option value="NVM01"><option value="NVT"><option value="NVV01">
-<option value="OAL"><option value="OLL01"><option value="OPP"><option value="OPS">
-<option value="PCW01"><option value="PDM01"><option value="PET"><option value="PFB">
-<option value="PGZ"><option value="PHB"><option value="PIL01"><option value="PLU">
-<option value="PMW"><option value="PMWT1"><option value="PNG01"><option value="PNZ">
-<option value="POA"><option value="POA01"><option value="POA03"><option value="POARC">
-<option value="POO01"><option value="PPB"><option value="PPY03"><option value="PSW01">
-<option value="PVH"><option value="PVH01"><option value="PVH02"><option value="QAK01">
-<option value="QBU01"><option value="QBX01"><option value="QCC01"><option value="QCD01">
-<option value="QCJ01"><option value="QDS01"><option value="QDV01"><option value="QDW03">
-<option value="QET02"><option value="QEV01"><option value="QGA01"><option value="QGB01">
-<option value="QGF01"><option value="QGP"><option value="QHB01"><option value="QHP01">
-<option value="QHV01"><option value="QIQ03"><option value="QIU01"><option value="QJA03">
-<option value="QJD01"><option value="QJF01"><option value="QJG01"><option value="QJH01">
-<option value="QJM01"><option value="QKA02"><option value="QKAT1"><option value="QKK01">
-<option value="QLB03"><option value="QLL01"><option value="QLY01"><option value="QMI02">
-<option value="QMO01"><option value="QNS02"><option value="QNV01"><option value="QOC03">
-<option value="QOC04"><option value="QPA02"><option value="QPB01"><option value="QPT01">
-<option value="QPV01"><option value="QPY01"><option value="QRV01"><option value="QSA01">
-<option value="QSC01"><option value="QSE02"><option value="QTB01"><option value="QVH02">
-<option value="QWJ01"><option value="QXD"><option value="QXM01"><option value="RAO">
-<option value="RBR"><option value="REC"><option value="REC04"><option value="REC05">
-<option value="RECT1"><option value="RIA"><option value="RIOT1"><option value="RIOT2">
-<option value="RIOT4"><option value="RODT1"><option value="ROO"><option value="RTF01">
-<option value="RVD"><option value="SAO09"><option value="SAO25"><option value="SAO30">
-<option value="SAO31"><option value="SDU"><option value="SER03"><option value="SJK">
-<option value="SJP"><option value="SLA01"><option value="SLZ"><option value="SMT">
-<option value="SOD03"><option value="SRR01"><option value="SSA"><option value="SSA02">
-<option value="SSAH1"><option value="SSAT3"><option value="SSZ01"><option value="STC01">
-<option value="STM"><option value="SUM02"><option value="TBT"><option value="TFF">
-<option value="TGQ"><option value="THE"><option value="TJL"><option value="TLZ01">
-<option value="TOW"><option value="TUR"><option value="TXF"><option value="UBA">
-<option value="UBX01"><option value="UDI"><option value="UMU"><option value="URG">
-<option value="UVI"><option value="VAG"><option value="VAL02"><option value="VCP">
-<option value="VDC"><option value="VIN02"><option value="VIX"><option value="VIX01">
-<option value="VPA02"><option value="VTM01"><option value="XAP"><option value="XAP01">
-<option value="ZBW01">
-</datalist>
-</td>
-</tr>
+    <tr id="aero" style="display:none;">
+      <td>Local retirada</td>
+      <td colspan="7">
+        <input list="listaAero" id="campoAeroporto">
+        <datalist id="listaAero">
+          <option value="AAX"><option value="AFL"><option value="AFLH1"><option value="AIF01">
+          <option value="AIR"><option value="AJA02"><option value="AJU"><option value="ANA01">
+          <option value="APD01"><option value="APQ01"><option value="APS02"><option value="APS03">
+          <option value="AQA"><option value="ARM01"><option value="ARU"><option value="ATM">
+          <option value="AXE01"><option value="BAC01"><option value="BEL"><option value="BELT1">
+          <option value="BFH"><option value="BGV03"><option value="BHZ01"><option value="BHZ04">
+          <option value="BHZ05"><option value="BNU02"><option value="BPG"><option value="BPS">
+          <option value="BRA"><option value="BSB"><option value="BSB01"><option value="BSB02">
+          <option value="BSB04"><option value="BVB"><option value="BVH"><option value="BVJ01">
+          <option value="BVS"><option value="CAC"><option value="CAC01"><option value="CAU">
+          <option value="CAU01"><option value="CAW01"><option value="CAX"><option value="CBA">
+          <option value="CBW"><option value="CCI01"><option value="CDSP1"><option value="CDSP2">
+          <option value="CDSP3"><option value="CDSP4"><option value="CEL"><option value="CFB">
+          <option value="CGB"><option value="CGB04"><option value="CGB05"><option value="CGBT2">
+          <option value="CGH"><option value="CGR"><option value="CGR01"><option value="CGRT1">
+          <option value="CIZ"><option value="CKS"><option value="CLV"><option value="CMG">
+          <option value="CNF"><option value="CNFT1"><option value="CPQ05"><option value="CPV">
+          <option value="CSG01"><option value="CSU"><option value="CTG02"><option value="CWB">
+          <option value="CWB05"><option value="CWBT1"><option value="CWBT2"><option value="CXJ">
+          <option value="CXJ03"><option value="DIQ"><option value="DOU"><option value="DOUT1">
+          <option value="DSO01"><option value="ERM"><option value="FEC"><option value="FEN">
+          <option value="FLN"><option value="FLN01"><option value="FLNT2"><option value="FOR">
+          <option value="FOR07"><option value="FORH8"><option value="FRC"><option value="GEL">
+          <option value="GGB"><option value="GIG"><option value="GNM02"><option value="GPB">
+          <option value="GRU"><option value="GRU03"><option value="GRUT1"><option value="GUI01">
+          <option value="GVR"><option value="GXP01"><option value="GYN"><option value="HTA01">
+          <option value="IDT01"><option value="IGU"><option value="IGU01"><option value="IJU02">
+          <option value="IMP"><option value="IOS"><option value="IPN"><option value="ITB">
+          <option value="ITG01"><option value="ITR01"><option value="IZA"><option value="JAC02">
+          <option value="JAU02"><option value="JDO"><option value="JDR"><option value="JIA">
+          <option value="JJD"><option value="JJG"><option value="JOI"><option value="JPA">
+          <option value="JPA01"><option value="JPA04"><option value="JPE"><option value="JPO">
+          <option value="JPR"><option value="JTC"><option value="JTN01"><option value="JUU01">
+          <option value="LAJ01"><option value="LAZ"><option value="LDB"><option value="LDBT1">
+          <option value="LFR02"><option value="LHNT1"><option value="LVR01"><option value="MAB">
+          <option value="MAO"><option value="MAO01"><option value="MCP"><option value="MCZ">
+          <option value="MCZH1"><option value="MEA"><option value="MEU"><option value="MGF">
+          <option value="MII"><option value="MMA01"><option value="MMM01"><option value="MOC">
+          <option value="MVF"><option value="NAT"><option value="NAT01"><option value="NIT03">
+          <option value="NNS01"><option value="NVM01"><option value="NVT"><option value="NVV01">
+          <option value="OAL"><option value="OLL01"><option value="OPP"><option value="OPS">
+          <option value="PCW01"><option value="PDM01"><option value="PET"><option value="PFB">
+          <option value="PGZ"><option value="PHB"><option value="PIL01"><option value="PLU">
+          <option value="PMW"><option value="PMWT1"><option value="PNG01"><option value="PNZ">
+          <option value="POA"><option value="POA01"><option value="POA03"><option value="POARC">
+          <option value="POO01"><option value="PPB"><option value="PPY03"><option value="PSW01">
+          <option value="PVH"><option value="PVH01"><option value="PVH02"><option value="QAK01">
+          <option value="QBU01"><option value="QBX01"><option value="QCC01"><option value="QCD01">
+          <option value="QCJ01"><option value="QDS01"><option value="QDV01"><option value="QDW03">
+          <option value="QET02"><option value="QEV01"><option value="QGA01"><option value="QGB01">
+          <option value="QGF01"><option value="QGP"><option value="QHB01"><option value="QHP01">
+          <option value="QHV01"><option value="QIQ03"><option value="QIU01"><option value="QJA03">
+          <option value="QJD01"><option value="QJF01"><option value="QJG01"><option value="QJH01">
+          <option value="QJM01"><option value="QKA02"><option value="QKAT1"><option value="QKK01">
+          <option value="QLB03"><option value="QLL01"><option value="QLY01"><option value="QMI02">
+          <option value="QMO01"><option value="QNS02"><option value="QNV01"><option value="QOC03">
+          <option value="QOC04"><option value="QPA02"><option value="QPB01"><option value="QPT01">
+          <option value="QPV01"><option value="QPY01"><option value="QRV01"><option value="QSA01">
+          <option value="QSC01"><option value="QSE02"><option value="QTB01"><option value="QVH02">
+          <option value="QWJ01"><option value="QXD"><option value="QXM01"><option value="RAO">
+          <option value="RBR"><option value="REC"><option value="REC04"><option value="REC05">
+          <option value="RECT1"><option value="RIA"><option value="RIOT1"><option value="RIOT2">
+          <option value="RIOT4"><option value="RODT1"><option value="ROO"><option value="RTF01">
+          <option value="RVD"><option value="SAO09"><option value="SAO25"><option value="SAO30">
+          <option value="SAO31"><option value="SDU"><option value="SER03"><option value="SJK">
+          <option value="SJP"><option value="SLA01"><option value="SLZ"><option value="SMT">
+          <option value="SOD03"><option value="SRR01"><option value="SSA"><option value="SSA02">
+          <option value="SSAH1"><option value="SSAT3"><option value="SSZ01"><option value="STC01">
+          <option value="STM"><option value="SUM02"><option value="TBT"><option value="TFF">
+          <option value="TGQ"><option value="THE"><option value="TJL"><option value="TLZ01">
+          <option value="TOW"><option value="TUR"><option value="TXF"><option value="UBA">
+          <option value="UBX01"><option value="UDI"><option value="UMU"><option value="URG">
+          <option value="UVI"><option value="VAG"><option value="VAL02"><option value="VCP">
+          <option value="VDC"><option value="VIN02"><option value="VIX"><option value="VIX01">
+          <option value="VPA02"><option value="VTM01"><option value="XAP"><option value="XAP01">
+          <option value="ZBW01">
+        </datalist>
+      </td>
+    </tr>
+  </table>
+</div>
 
-<tr>
-<td colspan="4" class="header">REMETENTE</td>
-<td colspan="4" class="header">DESTINATÁRIO</td>
-</tr>
+<!-- ETAPA 4 -->
+<div class="step">
+  <table>
+    <tr>
+      <td colspan="4" class="header">REMETENTE</td>
+      <td colspan="4" class="header">DESTINATÁRIO</td>
+    </tr>
 
-<tr>
-<td>Nome</td><td colspan="3"><input></td>
-<td>Nome</td><td colspan="3"><input></td>
-</tr>
+    <tr>
+      <td>Nome</td><td colspan="3"><input></td>
+      <td>Nome</td><td colspan="3"><input></td>
+    </tr>
 
-<tr>  
-<td>CPF/CNPJ</td><td colspan="3"><input class="cpf"></td>
-<td>CPF/CNPJ</td><td colspan="3"><input class="cpf"></td>
-</tr>
+    <tr>
+      <td>CPF/CNPJ</td><td colspan="3"><input class="cpf"></td>
+      <td>CPF/CNPJ</td><td colspan="3"><input class="cpf"></td>
+    </tr>
 
-<tr>
-<td>Endereço</td><td colspan="3"><input></td>
-<td>Endereço</td><td colspan="3"><input></td>
-</tr>
+    <tr>
+      <td>Endereço</td><td colspan="3"><input></td>
+      <td>Endereço</td><td colspan="3"><input></td>
+    </tr>
 
-<tr>
-<td>Nº</td><td colspan="3"><input></td>
-<td>Nº</td><td colspan="3"><input></td>
-</tr>
+    <tr>
+      <td>Nº</td><td colspan="3"><input></td>
+      <td>Nº</td><td colspan="3"><input></td>
+    </tr>
 
-<tr>
-<td>Compl.</td><td colspan="3"><input></td>
-<td>Compl.</td><td colspan="3"><input></td>
-</tr>
+    <tr>
+      <td>Compl.</td><td colspan="3"><input></td>
+      <td>Compl.</td><td colspan="3"><input></td>
+    </tr>
 
-<tr>
-<td>Cidade</td><td colspan="3"><input></td>
-<td>Cidade</td><td colspan="3"><input></td>
-</tr>
+    <tr>
+      <td>Cidade</td><td colspan="3"><input></td>
+      <td>Cidade</td><td colspan="3"><input></td>
+    </tr>
 
-<tr>
-<td>CEP</td><td colspan="3"><input class="cep"></td>
-<td>CEP</td><td colspan="3"><input class="cep"></td>
-</tr>
+    <tr>
+      <td>CEP</td><td colspan="3"><input class="cep"></td>
+      <td>CEP</td><td colspan="3"><input class="cep"></td>
+    </tr>
 
-<tr>
-<td>Telefone</td><td colspan="3"><input></td>
-<td>Telefone</td><td colspan="3"><input></td>
-</tr>
-</table>
+    <tr>
+      <td>Telefone</td><td colspan="3"><input></td>
+      <td>Telefone</td><td colspan="3"><input></td>
+    </tr>
+  </table>
+</div>
 
-<table>
-<tr><td colspan="6" class="header">INFORMAÇÕES DA CARGA</td></tr>
-<tr>
-<td>Volumes</td><td><input></td>
-<td>Peso (kg)</td><td><input></td>
-<td>Dimensões</td><td><input></td>
-</tr>
-<tr>
-<td>Tipo de embalagem</td><td colspan="2"><input></td>
-<td>Descrição</td><td colspan="2"><input></td>
-</tr>
-</table>
+<!-- ETAPA 5 -->
+<div class="step">
+  <table>
+    <tr><td colspan="6" class="header">INFORMAÇÕES DA CARGA</td></tr>
+    <tr>
+      <td>Volumes</td><td><input></td>
+      <td>Peso (kg)</td><td><input></td>
+      <td>Dimensões</td><td><input></td>
+    </tr>
+    <tr>
+      <td>Tipo de embalagem</td><td colspan="2"><input></td>
+      <td>Descrição</td><td colspan="2"><input></td>
+    </tr>
+  </table>
+</div>
 
-<table>
-<tr><td colspan="6" class="header">DOCUMENTAÇÃO</td></tr>
+<!-- ETAPA 6 -->
+<div class="step">
+  <table>
+    <tr><td colspan="6" class="header">DOCUMENTAÇÃO</td></tr>
 
-<tr>
-<td><input type="radio" name="doc" id="docNotaFiscal"></td>
-<td colspan="3">Nota fiscal - Valor (R$)</td>
-<td colspan="2"><input class="money"></td>
-</tr>
+    <tr>
+      <td><input type="radio" name="doc" id="docNotaFiscal"></td>
+      <td colspan="3">Nota fiscal - Valor (R$)</td>
+      <td colspan="2"><input class="money"></td>
+    </tr>
 
-<tr id="linhaNumeroNota" style="display:none;">
-<td></td>
-<td colspan="3">Número da nota fiscal</td>
-<td colspan="2"><input type="text" name="numero_nota_fiscal" placeholder="Digite o número da nota fiscal"></td>
-</tr>
+    <tr id="linhaNumeroNota" style="display:none;">
+      <td></td>
+      <td colspan="3">Número da nota fiscal</td>
+      <td colspan="2"><input type="text" name="numero_nota_fiscal" placeholder="Digite o número da nota fiscal"></td>
+    </tr>
 
-<tr>
-<td><input type="radio" name="doc" id="docDeclaracao"></td>
-<td colspan="3">Declaração de conteúdo - Valor declarado (R$)</td>
-<td colspan="2"><input class="money"></td>
-</tr>
-</table>
+    <tr>
+      <td><input type="radio" name="doc" id="docDeclaracao"></td>
+      <td colspan="3">Declaração de conteúdo - Valor declarado (R$)</td>
+      <td colspan="2"><input class="money"></td>
+    </tr>
+  </table>
+</div>
 
-<table>
-<tr><td class="header">DECLARAÇÃO</td></tr>
-<tr>
-<td style="font-size:9px;text-align:justify">
-Autorizo a emissão do conhecimento aéreo e o transporte do(s) volume(s) conforme especificações acima neste documento, responsabilizando-me por eventuais atrasos ou prejuizos decorrentes de informações incorretas ou incompletas nesta minuta. Declaro que: O(s) volume(s) foi(foram) submetido(s) a controles de segurança apropriados até o momento da entrega à Azul Linhas Aereas Brasileiras S.A. Até o momento da entrega à Azul Linhas Aereas Brasileiras S.A., o(s) volume(s) foi(foram) manuseados por pessoas devidamente autorizadas e treinadas para identificar artigos proibidos e/ou perigosos para o transporte aéreo, e nenhum deles apresenta historico criminal junto às autoridades policiais. O(s) volume(s) foi(foram) devidamente conferido(s) e inspecionado(s) e está(ão) de acordo com a descrição contida no documento fiscal correspondente, cujas informações integrarão o Conhecimento Aéreo-AWB. O(s) volume(s) está(ão) acondicionado(s) em embalagem(ns) adequada(s) para garantir a sua preservação durante o transporte até sua entrega ao destinatario. Quaisquer irregularidades identificadas no(s) volume(s) serão imediatamente comunicadas à Azul Linhas Aereas Brasileiras S.A. Afirmo que o(s) volume(s) apresentado(s) NÃO CONTEM nenhum dos itens abaixo, pois estou ciente de que são PROIBIDOS PARA TRANSPORTE PELA AZUL. Artigo Perigoso à segurança do transporte aereo (conforme classificação da ONU). Documento de Licitação; Animal Vivo; Carga Valor (acima de R$ 5.000,00/kg) ou Vulneravel, sem autorização prévia da Azul Cargo para aceitação.
-</td>
-</tr>
-</table>
+<!-- ETAPA 7 -->
+<div class="step">
+  <table>
+    <tr><td class="header">DECLARAÇÃO</td></tr>
+    <tr>
+      <td style="font-size:9px;text-align:justify">
+        Autorizo a emissão do conhecimento aéreo e o transporte do(s) volume(s) conforme especificações acima neste documento, responsabilizando-me por eventuais atrasos ou prejuizos decorrentes de informações incorretas ou incompletas nesta minuta. Declaro que: O(s) volume(s) foi(foram) submetido(s) a controles de segurança apropriados até o momento da entrega à Azul Linhas Aereas Brasileiras S.A. Até o momento da entrega à Azul Linhas Aereas Brasileiras S.A., o(s) volume(s) foi(foram) manuseados por pessoas devidamente autorizadas e treinadas para identificar artigos proibidos e/ou perigosos para o transporte aéreo, e nenhum deles apresenta historico criminal junto às autoridades policiais. O(s) volume(s) foi(foram) devidamente conferido(s) e inspecionado(s) e está(ão) de acordo com a descrição contida no documento fiscal correspondente, cujas informações integrarão o Conhecimento Aéreo-AWB. O(s) volume(s) está(ão) acondicionado(s) em embalagem(ns) adequada(s) para garantir a sua preservação durante o transporte até sua entrega ao destinatario. Quaisquer irregularidades identificadas no(s) volume(s) serão imediatamente comunicadas à Azul Linhas Aereas Brasileiras S.A. Afirmo que o(s) volume(s) apresentado(s) NÃO CONTEM nenhum dos itens abaixo, pois estou ciente de que são PROIBIDOS PARA TRANSPORTE PELA AZUL. Artigo Perigoso à segurança do transporte aereo (conforme classificação da ONU). Documento de Licitação; Animal Vivo; Carga Valor (acima de R$ 5.000,00/kg) ou Vulneravel, sem autorização prévia da Azul Cargo para aceitação.
+      </td>
+    </tr>
+  </table>
+</div>
 
-<table>
-<tr><td colspan="4" class="header">RESPONSÁVEL</td></tr>
-<tr>
-<td>Local</td><td><input></td>
-<td>Data</td><td><input class="data"></td>
-</tr>
-<tr>
-<td>RG</td><td><input class="rg"></td>
-<td>Nome</td><td><input></td>
-</tr>
-</table>
+<!-- ETAPA 8 -->
+<div class="step">
+  <table>
+    <tr><td colspan="4" class="header">RESPONSÁVEL</td></tr>
+    <tr>
+      <td>Local</td><td><input></td>
+      <td>Data</td><td><input class="data"></td>
+    </tr>
+    <tr>
+      <td>RG</td><td><input class="rg"></td>
+      <td>Nome</td><td><input></td>
+    </tr>
+  </table>
+</div>
 
-<button onclick="window.print()">GERAR PDF</button>
+<div class="wizard-nav">
+  <button type="button" id="btnVoltar" onclick="mudarEtapa(-1)">Voltar</button>
+  <button type="button" id="btnProximo" onclick="mudarEtapa(1)">Próximo</button>
+  <button type="button" id="btnPdf" onclick="window.print()">Gerar PDF</button>
+</div>
 
 </div>
 
 <script>
-
 // DETECÇÃO DE CELULAR
 function detectarCelular(){
-const ua = navigator.userAgent || "";
-const ehMobileUA = /Android|iPhone|iPod|iPad|Opera Mini|IEMobile|Mobile/i.test(ua);
-const ehTelaPequena = window.innerWidth <= 768;
+  const ua = navigator.userAgent || "";
+  const ehMobileUA = /Android|iPhone|iPod|iPad|Opera Mini|IEMobile|Mobile/i.test(ua);
+  const ehTelaPequena = window.innerWidth <= 768;
 
-if(ehMobileUA || ehTelaPequena){
-document.body.classList.add("mobile-device");
-}else{
-document.body.classList.remove("mobile-device");
-}
+  if(ehMobileUA || ehTelaPequena){
+    document.body.classList.add("mobile-device");
+  }else{
+    document.body.classList.remove("mobile-device");
+  }
 }
 
 window.addEventListener("load", detectarCelular);
 window.addEventListener("resize", detectarCelular);
+
+// WIZARD
+let etapaAtual = 0;
+const etapas = document.querySelectorAll(".step");
+
+function mostrarEtapa(index){
+  if (!etapas.length) return;
+
+  etapas.forEach((etapa, i) => {
+    etapa.classList.toggle("active-step", i === index);
+  });
+
+  const btnVoltar = document.getElementById("btnVoltar");
+  const btnProximo = document.getElementById("btnProximo");
+  const btnPdf = document.getElementById("btnPdf");
+  const stepLabel = document.getElementById("wizardStepLabel");
+
+  if (stepLabel) {
+    stepLabel.textContent = `Etapa ${index + 1} de ${etapas.length}`;
+  }
+
+  btnVoltar.style.display = index === 0 ? "none" : "block";
+
+  if (index === etapas.length - 1) {
+    btnProximo.style.display = "none";
+    btnPdf.style.display = "block";
+  } else {
+    btnProximo.style.display = "block";
+    btnPdf.style.display = "none";
+  }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function mudarEtapa(direcao){
+  const novoIndex = etapaAtual + direcao;
+
+  if (novoIndex < 0 || novoIndex >= etapas.length) return;
+
+  etapaAtual = novoIndex;
+  mostrarEtapa(etapaAtual);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  mostrarEtapa(etapaAtual);
+});
 
 // AEROPORTO
 function toggleAero(show){
@@ -502,18 +632,18 @@ function toggleAero(show){
 
 // CEP
 document.querySelectorAll(".cep").forEach(el=>{
-el.addEventListener("input",()=>{
-let v=el.value.replace(/\D/g,'').slice(0,8);
-v=v.replace(/(\d{5})(\d)/,"$1-$2");
-el.value=v;
-});
+  el.addEventListener("input",()=>{
+    let v=el.value.replace(/\D/g,'').slice(0,8);
+    v=v.replace(/(\d{5})(\d)/,"$1-$2");
+    el.value=v;
+  });
 });
 
-// CPF
+// CPF/CNPJ
 document.querySelectorAll(".cpf").forEach(el => {
     el.addEventListener("input", () => {
         let v = el.value.replace(/\D/g, '');
-        
+
         if (v.length <= 11) {
             v = v.replace(/(\d{3})(\d)/, "$1.$2");
             v = v.replace(/(\d{3})(\d)/, "$1.$2");
@@ -525,43 +655,24 @@ document.querySelectorAll(".cpf").forEach(el => {
             v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
             v = v.replace(/(\d{4})(\d)/, "$1-$2");
         }
-        
+
         el.value = v;
     });
 });
 
-// CNPJ
-document.querySelectorAll('.cpf').forEach(el => {
-    el.addEventListener('input', () => {
-        let v = el.value.replace(/\D/g, '');
-        if (v.length <= 11) {
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-        } else {
-            v = v.slice(0, 14);
-            v = v.replace(/^(\d{2})(\d)/, "$1.$2");
-            v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-            v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
-            v = v.replace(/(\d{4})(\d)/, "$1-$2");
-        }
-        el.value = v;
-    });
-});
-
-// 2. LÓGICA DE BLOQUEIO DO CAMPO DE FRETE
+// BLOQUEIO DO FRETE
 const radiosFrete = document.querySelectorAll('input[name="frete"]');
 const campoCnpjFrete = document.querySelector('input[name="cnpj_frete"]');
 
 function atualizarEstadoFrete() {
     const selecionado = document.querySelector('input[name="frete"]:checked');
-    if (selecionado && selecionado.value === "Pago na origem") {
+    if (campoCnpjFrete && selecionado && selecionado.value === "Pago na origem") {
         campoCnpjFrete.value = "";
         campoCnpjFrete.disabled = true;
         campoCnpjFrete.style.backgroundColor = "#f0f0f0";
-    } else {
+    } else if (campoCnpjFrete) {
         campoCnpjFrete.disabled = false;
-        campoCnpjFrete.style.backgroundColor = "white";
+        campoCnpjFrete.style.backgroundColor = "#dbe5f1";
     }
 }
 
@@ -570,35 +681,37 @@ atualizarEstadoFrete();
 
 // RG
 document.querySelectorAll(".rg").forEach(el=>{
-el.addEventListener("input",()=>{
-let v=el.value.replace(/\D/g,'').slice(0,9);
-v=v.replace(/(\d{2})(\d)/,"$1.$2");
-v=v.replace(/(\d{3})(\d)/,"$1.$2");
-v=v.replace(/(\d{3})(\d)/,"$1-$2");
-el.value=v;
-});
+  el.addEventListener("input",()=>{
+    let v=el.value.replace(/\D/g,'').slice(0,9);
+    v=v.replace(/(\d{2})(\d)/,"$1.$2");
+    v=v.replace(/(\d{3})(\d)/,"$1.$2");
+    v=v.replace(/(\d{3})(\d)/,"$1-$2");
+    el.value=v;
+  });
 });
 
 // DATA
 document.querySelectorAll(".data").forEach(el=>{
-el.addEventListener("input",()=>{
-let v=el.value.replace(/\D/g,'').slice(0,8);
-v=v.replace(/(\d{2})(\d)/,"$1/$2");
-v=v.replace(/(\d{2})(\d)/,"$1/$2");
-el.value=v;
-});
+  el.addEventListener("input",()=>{
+    let v=el.value.replace(/\D/g,'').slice(0,8);
+    v=v.replace(/(\d{2})(\d)/,"$1/$2");
+    v=v.replace(/(\d{2})(\d)/,"$1/$2");
+    el.value=v;
+  });
 });
 
 // MOEDA
 document.querySelectorAll(".money").forEach(el=>{
-el.addEventListener("input",()=>{
-let v=el.value.replace(/\D/g,'');
-v=(v/100).toFixed(2);
-v=v.replace(".",",");
-v=v.replace(/\B(?=(\d{3})+(?!\d))/g,".");
-el.value="R$ "+v;
+  el.addEventListener("input",()=>{
+    let v=el.value.replace(/\D/g,'');
+    v=(v/100).toFixed(2);
+    v=v.replace(".",",");
+    v=v.replace(/\B(?=(\d{3})+(?!\d))/g,".");
+    el.value="R$ "+v;
+  });
 });
-});
+
+// NOTA FISCAL
 const docNotaFiscal = document.getElementById("docNotaFiscal");
 const linhaNumeroNota = document.getElementById("linhaNumeroNota");
 const inputNumeroNota = document.querySelector('input[name="numero_nota_fiscal"]');
@@ -617,7 +730,7 @@ document.querySelectorAll('input[name="doc"]').forEach(radio => {
 });
 
 toggleNumeroNotaFiscal();
-
 </script>
+
 </body>
 </html>
