@@ -99,6 +99,10 @@
       font-size: 14px;
       outline: none;
     }
+    input[type="file"] {
+      background: #fff;
+      padding: 8px;
+    }
     textarea {
       min-height: 110px;
       resize: vertical;
@@ -116,6 +120,7 @@
       align-items: center;
       gap: 6px;
       font-size: 14px;
+      white-space: normal;
     }
     input[type="radio"] {
       width: auto;
@@ -203,6 +208,8 @@
       cursor: pointer;
       font-size: 12px;
       font-weight: 700;
+      width: auto;
+      min-height: auto;
     }
     .signature-canvas-box {
       width: 100%;
@@ -216,12 +223,56 @@
       background: #fff;
       touch-action: none;
     }
+    .app-links-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 12px;
+    }
+    .app-links-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0b2d5c;
+      margin-bottom: 10px;
+    }
+    .app-links-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .store-link {
+      display: block;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 12px;
+      background: #0b69c7;
+      color: #fff;
+      border: 2px solid #0b69c7;
+      text-align: center;
+      font-weight: 700;
+    }
+    .store-link small {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      opacity: 0.95;
+      margin-bottom: 4px;
+    }
+    .store-link strong {
+      display: block;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+    .file-note {
+      font-size: 12px;
+      color: #334155;
+    }
     @media (max-width: 768px) {
       body.mobile-device .page {
         max-width: 100%;
         padding: 12px;
       }
-      .grid, .grid-3 {
+      .grid, .grid-3, .app-links-grid {
         grid-template-columns: 1fr;
       }
       input, select, textarea {
@@ -254,6 +305,8 @@
       <input type="hidden" name="user_agent" id="user_agent">
       <input type="hidden" name="pdf_base64" id="pdf_base64">
       <input type="hidden" name="assinatura_base64" id="assinatura_base64">
+      <input type="hidden" name="anexo_dce_nome" id="anexo_dce_nome">
+      <input type="hidden" name="anexo_dce_base64" id="anexo_dce_base64">
 
       <section class="step active-step">
         <div class="card">
@@ -398,18 +451,41 @@
                 <label>Documento</label>
                 <div class="radio-group">
                   <label class="radio-option"><input type="radio" name="tipo_documento" id="docNotaFiscal" value="Nota fiscal">Nota fiscal</label>
-                  <label class="radio-option"><input type="radio" name="tipo_documento" id="docDeclaracao" value="Declaração de conteúdo">Declaração de conteúdo</label>
+                  <label class="radio-option"><input type="radio" name="tipo_documento" id="docDeclaracao" value="DC-e">DC-e</label>
                 </div>
               </div>
               <div class="field">
-                <label for="valor_documento">Valor (R$)</label>
+                <label id="labelValorDocumento" for="valor_documento">Nota fiscal - Valor (R$)</label>
                 <input id="valor_documento" class="money" name="valor_documento" type="text">
               </div>
             </div>
+
             <div class="grid-1" id="blocoNumeroNota" style="display:none;">
               <div class="field">
                 <label for="numero_nota_fiscal">Número da nota fiscal</label>
                 <input id="numero_nota_fiscal" name="numero_nota_fiscal" type="text" placeholder="Digite o número da nota fiscal">
+              </div>
+            </div>
+
+            <div class="grid-1" id="blocoDce" style="display:none;">
+              <div class="app-links-box">
+                <div class="app-links-title">Baixe o aplicativo para emitir o DC-e</div>
+                <div class="app-links-grid">
+                  <a id="appStoreLink" class="store-link" href="https://apps.apple.com/br/app/dce/id6753601602" target="_blank" rel="noopener noreferrer">
+                    <small>Disponível na</small>
+                    <strong>App Store</strong>
+                  </a>
+                  <a id="playStoreLink" class="store-link" href="https://play.google.com/store/apps/details?id=br.gov.pr.celepar.sefa.dce&amp;hl=pt_BR" target="_blank" rel="noopener noreferrer">
+                    <small>Disponível no</small>
+                    <strong>Google Play</strong>
+                  </a>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="anexo_dce">Anexar DC-e</label>
+                <input id="anexo_dce" name="anexo_dce" type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                <div class="file-note" id="anexoDceStatus">Nenhum arquivo anexado.</div>
               </div>
             </div>
           </div>
@@ -422,7 +498,7 @@
           <div class="card-body">
             <div class="field">
               <label for="declaracao_texto">Texto da declaração</label>
-              <textarea id="declaracao_texto" name="declaracao_texto">Autorizo a emissão do conhecimento aéreo e o transporte do(s) volume(s) conforme especificações acima neste documento, responsabilizando-me por eventuais atrasos ou prejuízos decorrentes de informações incorretas ou incompletas nesta minuta. Declaro que os volumes foram devidamente conferidos, estão de acordo com a descrição informada e acondicionados em embalagem adequada para o transporte até a entrega ao destinatário.</textarea>
+              <textarea id="declaracao_texto" name="declaracao_texto">Autorizo a emissão do conhecimento aéreo e o transporte do(s) volume(s) conforme especificações acima neste documento, responsabilizando-me por eventuais atrasos ou prejuizos decorrentes de informações incorretas ou incompletas nesta minuta. Declaro que: O(s) volume(s) foi(foram) submetido(s) a controles de segurança apropriados até o momento da entrega à Azul Linhas Aereas Brasileiras S.A. Até o momento da entrega à Azul Linhas Aereas Brasileiras S.A., o(s) volume(s) foi(foram) manuseados por pessoas devidamente autorizadas e treinadas para identificar artigos proibidos e/ou perigosos para o transporte aéreo, e nenhum deles apresenta historico criminal junto às autoridades policiais. O(s) volume(s) foi(foram) devidamente conferido(s) e inspecionado(s) e está(ão) de acordo com a descrição contida no documento fiscal correspondente, cujas informações integrarão o Conhecimento Aéreo-AWB. O(s) volume(s) está(ão) acondicionado(s) em embalagem(ns) adequada(s) para garantir a sua preservação durante o transporte até sua entrega ao destinatario. Quaisquer irregularidades identificadas no(s) volume(s) serão imediatamente comunicadas à Azul Linhas Aereas Brasileiras S.A. Afirmo que o(s) volume(s) apresentado(s) NÃO CONTEM nenhum dos itens abaixo, pois estou ciente de que são PROIBIDOS PARA TRANSPORTE PELA AZUL. Artigo Perigoso à segurança do transporte aereo (conforme classificação da ONU). Documento de Licitação; Animal Vivo; Carga Valor (acima de R$ 5.000,00/kg) ou Vulneravel, sem autorização prévia da Azul Cargo para aceitação.</textarea>
             </div>
           </div>
         </div>
@@ -494,6 +570,12 @@
   </div>
 
   <script>
+    const APP_STORE_URL = "https://apps.apple.com/br/app/dce/id6753601602";
+    const GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=br.gov.pr.celepar.sefa.dce&hl=pt_BR";
+
+    document.getElementById("appStoreLink").href = APP_STORE_URL;
+    document.getElementById("playStoreLink").href = GOOGLE_PLAY_URL;
+
     function detectarCelular() {
       const ua = navigator.userAgent || "";
       const ehMobileUA = /Android|iPhone|iPod|iPad|Opera Mini|IEMobile|Mobile/i.test(ua);
@@ -542,7 +624,7 @@
         step.classList.toggle("active-step", i === index);
       });
 
-      stepLabel.textContent = `Etapa ${index + 1} de ${steps.length}`;
+      stepLabel.textContent = Etapa ${index + 1} de ${steps.length};
       btnVoltar.style.display = index === 0 ? "none" : "block";
 
       const ultima = index === steps.length - 1;
@@ -571,7 +653,7 @@
     });
 
     function getRadioValue(name) {
-      const checked = document.querySelector(`input[name="${name}"]:checked`);
+      const checked = document.querySelector(input[name="${name}"]:checked);
       return checked ? checked.value : "";
     }
 
@@ -584,14 +666,38 @@
 
     function toggleNumeroNotaFiscal() {
       const docNota = document.getElementById("docNotaFiscal");
-      const bloco = document.getElementById("blocoNumeroNota");
-      const campo = document.getElementById("numero_nota_fiscal");
+      const docDce = document.getElementById("docDeclaracao");
+      const blocoNota = document.getElementById("blocoNumeroNota");
+      const blocoDce = document.getElementById("blocoDce");
+      const campoNota = document.getElementById("numero_nota_fiscal");
+      const labelValor = document.getElementById("labelValorDocumento");
+      const anexo = document.getElementById("anexo_dce");
+      const anexoNome = document.getElementById("anexo_dce_nome");
+      const anexoBase64 = document.getElementById("anexo_dce_base64");
+      const anexoStatus = document.getElementById("anexoDceStatus");
 
       if (docNota && docNota.checked) {
-        bloco.style.display = "block";
+        blocoNota.style.display = "block";
+        blocoDce.style.display = "none";
+        labelValor.textContent = "Nota fiscal - Valor (R$)";
+        if (anexo) anexo.value = "";
+        anexoNome.value = "";
+        anexoBase64.value = "";
+        anexoStatus.textContent = "Nenhum arquivo anexado.";
+      } else if (docDce && docDce.checked) {
+        blocoNota.style.display = "none";
+        blocoDce.style.display = "grid";
+        campoNota.value = "";
+        labelValor.textContent = "DC-e - Valor declarado (R$)";
       } else {
-        bloco.style.display = "none";
-        campo.value = "";
+        blocoNota.style.display = "none";
+        blocoDce.style.display = "none";
+        campoNota.value = "";
+        if (anexo) anexo.value = "";
+        anexoNome.value = "";
+        anexoBase64.value = "";
+        anexoStatus.textContent = "Nenhum arquivo anexado.";
+        labelValor.textContent = "Documento - Valor (R$)";
       }
     }
 
@@ -677,6 +783,45 @@
     atualizarEstadoFrete();
     toggleNumeroNotaFiscal();
 
+    const anexoDceInput = document.getElementById("anexo_dce");
+    const anexoDceNome = document.getElementById("anexo_dce_nome");
+    const anexoDceBase64 = document.getElementById("anexo_dce_base64");
+    const anexoDceStatus = document.getElementById("anexoDceStatus");
+
+    anexoDceInput.addEventListener("change", async (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) {
+        anexoDceNome.value = "";
+        anexoDceBase64.value = "";
+        anexoDceStatus.textContent = "Nenhum arquivo anexado.";
+        return;
+      }
+
+      try {
+        const base64 = await fileToBase64(file);
+        anexoDceNome.value = file.name;
+        anexoDceBase64.value = base64;
+        anexoDceStatus.textContent = Arquivo anexado: ${file.name};
+      } catch (error) {
+        anexoDceNome.value = "";
+        anexoDceBase64.value = "";
+        anexoDceStatus.textContent = "Falha ao processar o arquivo.";
+      }
+    });
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result || "";
+          const base64 = String(result).split(",")[1] || "";
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
     function coletarDados() {
       const formData = new FormData(form);
       const data = {};
@@ -697,51 +842,52 @@
     function montarRevisao() {
       const d = coletarDados();
       const texto = [
-        `Nº coleta: ${d.numero_coleta || ""}`,
-        `Tipo de serviço: ${d.tipo_servico || ""}`,
-        `Pagamento frete: ${d.frete || ""}`,
-        `Tomador: ${d.tomador || ""}`,
-        `CNPJ tomador: ${d.cnpj_frete || ""}`,
-        `Forma de entrega: ${d.forma_entrega || ""}`,
-        `Local retirada: ${d.local_retirada || ""}`,
+        Nº coleta: ${d.numero_coleta || ""},
+        Tipo de serviço: ${d.tipo_servico || ""},
+        Pagamento frete: ${d.frete || ""},
+        Tomador: ${d.tomador || ""},
+        CNPJ tomador: ${d.cnpj_frete || ""},
+        Forma de entrega: ${d.forma_entrega || ""},
+        Local retirada: ${d.local_retirada || ""},
         ``,
-        `REMETENTE`,
-        `Nome: ${d.remetente_nome || ""}`,
-        `CPF/CNPJ: ${d.remetente_cpf_cnpj || ""}`,
-        `Endereço: ${d.remetente_endereco || ""}, ${d.remetente_numero || ""}`,
-        `Complemento: ${d.remetente_complemento || ""}`,
-        `Cidade: ${d.remetente_cidade || ""}`,
-        `CEP: ${d.remetente_cep || ""}`,
-        `Telefone: ${d.remetente_telefone || ""}`,
+        REMETENTE,
+        Nome: ${d.remetente_nome || ""},
+        CPF/CNPJ: ${d.remetente_cpf_cnpj || ""},
+        Endereço: ${d.remetente_endereco || ""}, ${d.remetente_numero || ""},
+        Complemento: ${d.remetente_complemento || ""},
+        Cidade: ${d.remetente_cidade || ""},
+        CEP: ${d.remetente_cep || ""},
+        Telefone: ${d.remetente_telefone || ""},
         ``,
-        `DESTINATÁRIO`,
-        `Nome: ${d.destinatario_nome || ""}`,
-        `CPF/CNPJ: ${d.destinatario_cpf_cnpj || ""}`,
-        `Endereço: ${d.destinatario_endereco || ""}, ${d.destinatario_numero || ""}`,
-        `Complemento: ${d.destinatario_complemento || ""}`,
-        `Cidade: ${d.destinatario_cidade || ""}`,
-        `CEP: ${d.destinatario_cep || ""}`,
-        `Telefone: ${d.destinatario_telefone || ""}`,
+        DESTINATÁRIO,
+        Nome: ${d.destinatario_nome || ""},
+        CPF/CNPJ: ${d.destinatario_cpf_cnpj || ""},
+        Endereço: ${d.destinatario_endereco || ""}, ${d.destinatario_numero || ""},
+        Complemento: ${d.destinatario_complemento || ""},
+        Cidade: ${d.destinatario_cidade || ""},
+        CEP: ${d.destinatario_cep || ""},
+        Telefone: ${d.destinatario_telefone || ""},
         ``,
-        `CARGA`,
-        `Volumes: ${d.volumes || ""}`,
-        `Peso (kg): ${d.peso_kg || ""}`,
-        `Dimensões: ${d.dimensoes || ""}`,
-        `Tipo embalagem: ${d.tipo_embalagem || ""}`,
-        `Descrição: ${d.descricao_carga || ""}`,
+        CARGA,
+        Volumes: ${d.volumes || ""},
+        Peso (kg): ${d.peso_kg || ""},
+        Dimensões: ${d.dimensoes || ""},
+        Tipo embalagem: ${d.tipo_embalagem || ""},
+        Descrição: ${d.descricao_carga || ""},
         ``,
-        `DOCUMENTAÇÃO`,
-        `Tipo: ${d.tipo_documento || ""}`,
-        `Valor: ${d.valor_documento || ""}`,
-        `Número NF: ${d.numero_nota_fiscal || ""}`,
+        DOCUMENTAÇÃO,
+        Tipo: ${d.tipo_documento || ""},
+        Valor: ${d.valor_documento || ""},
+        Número NF: ${d.numero_nota_fiscal || ""},
+        Anexo DC-e: ${d.anexo_dce_nome || ""},
         ``,
-        `RESPONSÁVEL`,
-        `Local: ${d.responsavel_local || ""}`,
-        `Data: ${d.responsavel_data || ""}`,
-        `RG: ${d.responsavel_rg || ""}`,
-        `Nome: ${d.responsavel_nome || ""}`,
+        RESPONSÁVEL,
+        Local: ${d.responsavel_local || ""},
+        Data: ${d.responsavel_data || ""},
+        RG: ${d.responsavel_rg || ""},
+        Nome: ${d.responsavel_nome || ""},
         ``,
-        `Observações: ${d.observacoes || ""}`
+        Observações: ${d.observacoes || ""}
       ].join("\n");
 
       reviewBox.textContent = texto;
@@ -814,11 +960,9 @@
     assinaturaCanvas.addEventListener("mousemove", moverAssinatura);
     assinaturaCanvas.addEventListener("mouseup", finalizarAssinatura);
     assinaturaCanvas.addEventListener("mouseleave", finalizarAssinatura);
-
     assinaturaCanvas.addEventListener("touchstart", iniciarAssinatura, { passive: false });
     assinaturaCanvas.addEventListener("touchmove", moverAssinatura, { passive: false });
     assinaturaCanvas.addEventListener("touchend", finalizarAssinatura, { passive: false });
-
     window.addEventListener("load", ajustarCanvasAssinatura);
     window.addEventListener("resize", ajustarCanvasAssinatura);
 
@@ -864,16 +1008,6 @@
       const safeValue = value || "";
       const textLines = doc.splitTextToSize(String(safeValue), Math.max(5, fieldW - 2));
       doc.text(textLines.slice(0, 2), fieldX + 1.2, y + 4.2);
-    }
-
-    function drawSimpleField(doc, x, y, w, h, value) {
-      drawBorder(doc, x, y, w, h);
-      doc.setFillColor(220, 230, 241);
-      doc.rect(x + 1, y + 1, w - 2, h - 2, "F");
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(7.5);
-      const lines = doc.splitTextToSize(String(value || ""), Math.max(5, w - 4));
-      doc.text(lines.slice(0, 2), x + 2, y + 4.2);
     }
 
     function drawCheckboxLine(doc, x, y, w, text, checked, valueText = "") {
@@ -1019,7 +1153,7 @@
       doc.text("Retirada na unidade", pageX + 82, y + 4.2);
 
       if (d.local_retirada) {
-        doc.text(`Local: ${d.local_retirada}`, pageX + 132, y + 4.2);
+        doc.text(Local: ${d.local_retirada}, pageX + 132, y + 4.2);
       }
       y += 7;
 
@@ -1080,7 +1214,7 @@
 
       drawCheckboxLine(doc, pageX, y, pageW, "Nota fiscal - Valor (R$)", d.tipo_documento === "Nota fiscal", d.tipo_documento === "Nota fiscal" ? d.valor_documento : "");
       y += 7;
-      drawCheckboxLine(doc, pageX, y, pageW, "Declaração de conteúdo - Valor declarado (R$)", d.tipo_documento === "Declaração de conteúdo", d.tipo_documento === "Declaração de conteúdo" ? d.valor_documento : "");
+      drawCheckboxLine(doc, pageX, y, pageW, "DC-e - Valor declarado (R$)", d.tipo_documento === "DC-e", d.tipo_documento === "DC-e" ? d.valor_documento : "");
       y += 7;
 
       if (d.numero_nota_fiscal) {
@@ -1088,15 +1222,20 @@
         y += 7;
       }
 
+      if (d.anexo_dce_nome) {
+        drawFieldCell(doc, pageX, y, pageW, 7, "Anexo DC-e", d.anexo_dce_nome || "", 28);
+        y += 7;
+      }
+
       drawHeaderBar(doc, "DECLARAÇÃO", pageX, y, pageW, 6);
       y += 6;
 
-      const declaracaoH = 26;
+      const declaracaoH = 42;
       drawBorder(doc, pageX, y, pageW, declaracaoH);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(5.8);
       const declaracaoTexto = doc.splitTextToSize(String(d.declaracao_texto || ""), 186);
-      doc.text(declaracaoTexto.slice(0, 10), pageX + 1.5, y + 3.8);
+      doc.text(declaracaoTexto.slice(0, 18), pageX + 1.5, y + 3.8);
       y += declaracaoH;
 
       drawHeaderBar(doc, "RESPONSÁVEL", pageX, y, pageW, 6);
@@ -1128,7 +1267,6 @@
         binary += String.fromCharCode(bytes[i]);
       }
       const base64 = btoa(binary);
-
       document.getElementById("pdf_base64").value = base64;
 
       return { doc, base64 };
@@ -1138,7 +1276,7 @@
       try {
         const { doc } = await gerarPdfBase64();
         const numero = document.getElementById("numero_coleta").value || "minuta";
-        doc.save(`minuta-${numero}.pdf`);
+        doc.save(minuta-${numero}.pdf);
       } catch (e) {
         mostrarStatus("error", "Falha ao gerar PDF.");
       }
@@ -1150,6 +1288,8 @@
         const payload = coletarDados();
         payload.pdf_base64 = base64;
         payload.assinatura_base64 = assinaturaInput.value || "";
+        payload.anexo_dce_nome = document.getElementById("anexo_dce_nome").value || "";
+        payload.anexo_dce_base64 = document.getElementById("anexo_dce_base64").value || "";
 
         const response = await fetch("/api/minutas", {
           method: "POST",
@@ -1163,7 +1303,7 @@
           throw new Error(result.error || "Falha ao enviar.");
         }
 
-        mostrarStatus("success", `Minuta enviada com sucesso. ID: ${result.id}`);
+        mostrarStatus("success", Minuta enviada com sucesso. ID: ${result.id});
       } catch (e) {
         mostrarStatus("error", e.message || "Erro no envio.");
       }
