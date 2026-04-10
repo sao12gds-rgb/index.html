@@ -31,6 +31,18 @@
       margin-bottom: 14px;
       flex-wrap: wrap;
     }
+    .wizard-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .wizard-logo {
+      height: 44px;
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
     .wizard-title {
       font-size: 18px;
       font-weight: 700;
@@ -268,13 +280,17 @@
       .grid, .grid-3, .app-links-grid { grid-template-columns: 1fr; }
       input, select, textarea { font-size: 16px; }
       .wizard-title { font-size: 16px; }
+      .wizard-logo { height: 38px; }
     }
   </style>
 </head>
 <body>
   <div class="page">
     <div class="wizard-top">
-      <div class="wizard-title">Minuta de Despacho de Carga</div>
+      <div class="wizard-brand">
+        <img id="logoAzul" class="wizard-logo" src="logo-azulcargo.png" alt="Azul Cargo">
+        <div class="wizard-title">Minuta de Despacho de Carga</div>
+      </div>
       <div class="wizard-badge" id="wizardStepLabel">Etapa 1 de 12</div>
     </div>
 
@@ -334,7 +350,7 @@
             <div class="grid-1">
               <div class="field">
                 <label for="cnpj_frete">CNPJ do tomador</label>
-                <input id="cnpj_frete" class="cpf" name="cnpj_frete" maxlength="18" placeholder="00.000.000/0000-00">
+                <input id="cnpj_frete" name="cnpj_frete" maxlength="18" placeholder="00.000.000/0000-00" type="text">
               </div>
             </div>
           </div>
@@ -375,7 +391,7 @@
           <div class="card-body">
             <div class="grid">
               <div class="field"><label for="remetente_nome">Nome</label><input id="remetente_nome" name="remetente_nome" type="text"></div>
-              <div class="field"><label for="remetente_cpf_cnpj">CPF/CNPJ</label><input id="remetente_cpf_cnpj" class="cpf" name="remetente_cpf_cnpj" type="text"></div>
+              <div class="field"><label for="remetente_cpf_cnpj">CPF/CNPJ</label><input id="remetente_cpf_cnpj" class="cpf-cnpj" name="remetente_cpf_cnpj" type="text"></div>
               <div class="field"><label for="remetente_endereco">Endereço</label><input id="remetente_endereco" name="remetente_endereco" type="text"></div>
               <div class="field"><label for="remetente_numero">Nº</label><input id="remetente_numero" name="remetente_numero" type="text"></div>
               <div class="field"><label for="remetente_complemento">Complemento</label><input id="remetente_complemento" name="remetente_complemento" type="text"></div>
@@ -393,7 +409,7 @@
           <div class="card-body">
             <div class="grid">
               <div class="field"><label for="destinatario_nome">Nome</label><input id="destinatario_nome" name="destinatario_nome" type="text"></div>
-              <div class="field"><label for="destinatario_cpf_cnpj">CPF/CNPJ</label><input id="destinatario_cpf_cnpj" class="cpf" name="destinatario_cpf_cnpj" type="text"></div>
+              <div class="field"><label for="destinatario_cpf_cnpj">CPF/CNPJ</label><input id="destinatario_cpf_cnpj" class="cpf-cnpj" name="destinatario_cpf_cnpj" type="text"></div>
               <div class="field"><label for="destinatario_endereco">Endereço</label><input id="destinatario_endereco" name="destinatario_endereco" type="text"></div>
               <div class="field"><label for="destinatario_numero">Nº</label><input id="destinatario_numero" name="destinatario_numero" type="text"></div>
               <div class="field"><label for="destinatario_complemento">Complemento</label><input id="destinatario_complemento" name="destinatario_complemento" type="text"></div>
@@ -448,6 +464,11 @@
             </div>
 
             <div class="grid-1" id="blocoDce" style="display:none;">
+              <div class="field">
+                <label for="numero_dce">Número do DC-e</label>
+                <input id="numero_dce" name="numero_dce" type="text" placeholder="Digite o número do DC-e">
+              </div>
+
               <div class="app-links-box">
                 <div class="app-links-title">Baixe o aplicativo para emitir o DC-e</div>
                 <div class="app-links-grid">
@@ -605,6 +626,31 @@
       document.getElementById("user_agent").value = navigator.userAgent || "";
     }
 
+    function onlyDigits(value) {
+      return String(value || "").replace(/\D/g, "");
+    }
+
+    function maskCNPJ(value) {
+      let v = onlyDigits(value).slice(0, 14);
+      v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+      v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+      v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+      v = v.replace(/(\d{4})(\d)/, "$1-$2");
+      return v;
+    }
+
+    function maskCPForCNPJ(value) {
+      let v = onlyDigits(value);
+      if (v.length <= 11) {
+        v = v.slice(0, 11);
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        return v;
+      }
+      return maskCNPJ(v);
+    }
+
     function getRadioValue(name) {
       const checked = document.querySelector(`input[name="${name}"]:checked`);
       return checked ? checked.value : "";
@@ -623,6 +669,7 @@
       const blocoNota = document.getElementById("blocoNumeroNota");
       const blocoDce = document.getElementById("blocoDce");
       const campoNota = document.getElementById("numero_nota_fiscal");
+      const campoDce = document.getElementById("numero_dce");
       const labelValor = document.getElementById("labelValorDocumento");
       const anexo = document.getElementById("anexo_dce");
       const anexoNome = document.getElementById("anexo_dce_nome");
@@ -633,6 +680,7 @@
         blocoNota.style.display = "block";
         blocoDce.style.display = "none";
         labelValor.textContent = "Nota fiscal - Valor (R$)";
+        campoDce.value = "";
         anexo.value = "";
         anexoNome.value = "";
         anexoBase64.value = "";
@@ -646,6 +694,7 @@
         blocoNota.style.display = "none";
         blocoDce.style.display = "none";
         campoNota.value = "";
+        campoDce.value = "";
         anexo.value = "";
         anexoNome.value = "";
         anexoBase64.value = "";
@@ -736,6 +785,7 @@
         `Tipo: ${d.tipo_documento || ""}`,
         `Valor: ${d.valor_documento || ""}`,
         `Número NF: ${d.numero_nota_fiscal || ""}`,
+        `Número DC-e: ${d.numero_dce || ""}`,
         `Anexo DC-e: ${d.anexo_dce_nome || ""}`,
         ``,
         `RESPONSÁVEL`,
@@ -758,6 +808,26 @@
       const box = document.getElementById("statusBox");
       box.className = "status-box";
       box.textContent = "";
+    }
+
+    function getLogoDataUrl() {
+      return new Promise((resolve) => {
+        const img = document.getElementById("logoAzul");
+        if (!img || !img.complete) {
+          resolve(null);
+          return;
+        }
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.naturalWidth || img.width;
+          canvas.height = img.naturalHeight || img.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL("image/png"));
+        } catch {
+          resolve(null);
+        }
+      });
     }
 
     function drawFilledRect(doc, x, y, w, h, color) {
@@ -823,6 +893,7 @@
       const doc = new jsPDF("p", "mm", "a4");
       const d = coletarDados();
       const assinaturaBase64 = document.getElementById("assinatura_base64").value || "";
+      const logoDataUrl = await getLogoDataUrl();
 
       doc.setDrawColor(0, 0, 0);
       doc.setLineWidth(0.2);
@@ -832,17 +903,17 @@
       let y = 10;
 
       drawBorder(doc, pageX, y, 55, 14);
+      if (logoDataUrl) {
+        try {
+          doc.addImage(logoDataUrl, "PNG", pageX + 3, y + 2, 28, 10);
+        } catch {}
+      }
       doc.setFont("helvetica", "bold");
       doc.setFontSize(14);
       doc.setTextColor(11, 45, 92);
-      doc.text("Azulcargo", pageX + 16, y + 5.5);
+      doc.text("Azulcargo", pageX + 24, y + 5.5);
       doc.setFontSize(13);
-      doc.text("Express", pageX + 16, y + 11.2);
-      doc.setLineWidth(1.2);
-      doc.line(pageX + 5, y + 3, pageX + 7.5, y + 7);
-      doc.line(pageX + 7.5, y + 7, pageX + 5, y + 11);
-      doc.line(pageX + 9.5, y + 3, pageX + 12, y + 7);
-      doc.line(pageX + 12, y + 7, pageX + 9.5, y + 11);
+      doc.text("Express", pageX + 24, y + 11.2);
       doc.setLineWidth(0.2);
 
       drawBorder(doc, pageX + 55, y, 58, 14);
@@ -997,6 +1068,10 @@
         drawFieldCell(doc, pageX, y, pageW, 7, "Número da nota fiscal", d.numero_nota_fiscal || "", 42);
         y += 7;
       }
+      if (d.numero_dce) {
+        drawFieldCell(doc, pageX, y, pageW, 7, "Número do DC-e", d.numero_dce || "", 35);
+        y += 7;
+      }
       if (d.anexo_dce_nome) {
         drawFieldCell(doc, pageX, y, pageW, 7, "Anexo DC-e", d.anexo_dce_nome || "", 28);
         y += 7;
@@ -1047,6 +1122,57 @@
       });
       document.querySelectorAll('input[name="frete"]').forEach(r => {
         r.addEventListener("change", atualizarEstadoFrete);
+      });
+
+      document.getElementById("cnpj_frete").addEventListener("input", (e) => {
+        e.target.value = maskCNPJ(e.target.value);
+      });
+
+      document.querySelectorAll(".cpf-cnpj").forEach(el => {
+        el.addEventListener("input", (e) => {
+          e.target.value = maskCPForCNPJ(e.target.value);
+        });
+      });
+
+      document.querySelectorAll(".cep").forEach(el => {
+        el.addEventListener("input", () => {
+          let v = onlyDigits(el.value).slice(0, 8);
+          v = v.replace(/(\d{5})(\d)/, "$1-$2");
+          el.value = v;
+        });
+      });
+
+      document.querySelectorAll(".rg").forEach(el => {
+        el.addEventListener("input", () => {
+          let v = onlyDigits(el.value).slice(0, 9);
+          v = v.replace(/(\d{2})(\d)/, "$1.$2");
+          v = v.replace(/(\d{3})(\d)/, "$1.$2");
+          v = v.replace(/(\d{3})(\d)/, "$1-$2");
+          el.value = v;
+        });
+      });
+
+      document.querySelectorAll(".data").forEach(el => {
+        el.addEventListener("input", () => {
+          let v = onlyDigits(el.value).slice(0, 8);
+          v = v.replace(/(\d{2})(\d)/, "$1/$2");
+          v = v.replace(/(\d{2})(\d)/, "$1/$2");
+          el.value = v;
+        });
+      });
+
+      document.querySelectorAll(".money").forEach(el => {
+        el.addEventListener("input", () => {
+          let v = onlyDigits(el.value);
+          if (!v) {
+            el.value = "";
+            return;
+          }
+          v = (v / 100).toFixed(2);
+          v = v.replace(".", ",");
+          v = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+          el.value = "R$ " + v;
+        });
       });
 
       const anexoDceInput = document.getElementById("anexo_dce");
