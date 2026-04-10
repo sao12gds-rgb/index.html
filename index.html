@@ -289,7 +289,6 @@
     <div class="wizard-top">
       <div class="wizard-brand">
         <img id="logoAzul" class="wizard-logo" src="logo-azulcargo.png" alt="Azul Cargo">
-        <div class="wizard-title">Minuta de Despacho de Carga</div>
       </div>
       <div class="wizard-badge" id="wizardStepLabel">Etapa 1 de 12</div>
     </div>
@@ -677,7 +676,7 @@
       const anexoStatus = document.getElementById("anexoDceStatus");
 
       if (docNota.checked) {
-        blocoNota.style.display = "block";
+        blocoNota.style.display = "grid";
         blocoDce.style.display = "none";
         labelValor.textContent = "Nota fiscal - Valor (R$)";
         campoDce.value = "";
@@ -905,18 +904,12 @@
       drawBorder(doc, pageX, y, 55, 14);
       if (logoDataUrl) {
         try {
-          doc.addImage(logoDataUrl, "PNG", pageX + 3, y + 2, 28, 10);
+          doc.addImage(logoDataUrl, "PNG", pageX + 6, y + 2, 42, 10);
         } catch {}
       }
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(14);
-      doc.setTextColor(11, 45, 92);
-      doc.text("Azulcargo", pageX + 24, y + 5.5);
-      doc.setFontSize(13);
-      doc.text("Express", pageX + 24, y + 11.2);
-      doc.setLineWidth(0.2);
 
       drawBorder(doc, pageX + 55, y, 58, 14);
+      doc.setFont("helvetica", "bold");
       doc.setFontSize(9);
       doc.setTextColor(0, 0, 0);
       doc.text("MINUTA DE DESPACHO DE CARGA", pageX + 58, y + 8);
