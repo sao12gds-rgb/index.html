@@ -1,25 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Minuta Azul</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     * { box-sizing: border-box; }
     html, body {
-      width: 100%;
-      max-width: 100%;
-      overflow-x: hidden;
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
+      width: 100%;
       background: #eef1f5;
+      font-family: Arial, sans-serif;
       color: #111827;
     }
     body.mobile-device { background: #fff; }
     .page {
-      width: 100%;
       max-width: 920px;
       margin: 0 auto;
       background: #fff;
@@ -120,7 +117,6 @@
       align-items: center;
       gap: 6px;
       font-size: 14px;
-      white-space: normal;
     }
     input[type="radio"] {
       width: auto;
@@ -268,19 +264,10 @@
       color: #334155;
     }
     @media (max-width: 768px) {
-      body.mobile-device .page {
-        max-width: 100%;
-        padding: 12px;
-      }
-      .grid, .grid-3, .app-links-grid {
-        grid-template-columns: 1fr;
-      }
-      input, select, textarea {
-        font-size: 16px;
-      }
-      .wizard-title {
-        font-size: 16px;
-      }
+      .page { padding: 12px; }
+      .grid, .grid-3, .app-links-grid { grid-template-columns: 1fr; }
+      input, select, textarea { font-size: 16px; }
+      .wizard-title { font-size: 16px; }
     }
   </style>
 </head>
@@ -468,7 +455,7 @@
                     <small>Disponível na</small>
                     <strong>App Store</strong>
                   </a>
-                  <a id="playStoreLink" class="store-link" href="https://play.google.com/store/apps/details?id=br.gov.pr.celepar.sefa.dce&amp;hl=pt_BR" target="_blank" rel="noopener noreferrer">
+                  <a id="playStoreLink" class="store-link" href="https://play.google.com/store/apps/details?id=br.gov.pr.celepar.sefa.dce&hl=pt_BR" target="_blank" rel="noopener noreferrer">
                     <small>Disponível no</small>
                     <strong>Google Play</strong>
                   </a>
@@ -563,26 +550,63 @@
   </div>
 
   <script>
+    let etapaAtual = 0;
+
+    function showStep(index) {
+      const steps = document.querySelectorAll(".step");
+      const btnVoltar = document.getElementById("btnVoltar");
+      const btnProximo = document.getElementById("btnProximo");
+      const btnPdf = document.getElementById("btnPdf");
+      const btnEnviar = document.getElementById("btnEnviar");
+      const badge = document.getElementById("wizardStepLabel");
+
+      steps.forEach((step, i) => {
+        step.classList.toggle("active-step", i === index);
+      });
+
+      badge.textContent = `Etapa ${index + 1} de ${steps.length}`;
+      btnVoltar.style.display = index === 0 ? "none" : "block";
+
+      const ultima = index === steps.length - 1;
+      btnProximo.style.display = ultima ? "none" : "block";
+      btnPdf.style.display = ultima ? "block" : "none";
+      btnEnviar.style.display = ultima ? "block" : "none";
+
+      if (ultima) montarRevisao();
+      limparStatus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function nextStep() {
+      const total = document.querySelectorAll(".step").length;
+      if (etapaAtual < total - 1) {
+        etapaAtual += 1;
+        showStep(etapaAtual);
+      }
+    }
+
+    function prevStep() {
+      if (etapaAtual > 0) {
+        etapaAtual -= 1;
+        showStep(etapaAtual);
+      }
+    }
+
     function detectarCelular() {
       const ua = navigator.userAgent || "";
       const ehMobileUA = /Android|iPhone|iPod|iPad|Opera Mini|IEMobile|Mobile/i.test(ua);
       const ehTelaPequena = window.innerWidth <= 768;
 
-      if (ehMobileUA || ehTelaPequena) {
-        document.body.classList.add("mobile-device");
-        document.getElementById("tipo_dispositivo").value = "MOBILE";
-      } else {
-        document.body.classList.remove("mobile-device");
-        document.getElementById("tipo_dispositivo").value = "DESKTOP";
-      }
+      document.body.classList.toggle("mobile-device", ehMobileUA || ehTelaPequena);
 
+      document.getElementById("tipo_dispositivo").value = (ehMobileUA || ehTelaPequena) ? "MOBILE" : "DESKTOP";
       document.getElementById("largura_tela").value = window.innerWidth || "";
       document.getElementById("altura_tela").value = window.innerHeight || "";
       document.getElementById("user_agent").value = navigator.userAgent || "";
     }
 
     function getRadioValue(name) {
-      const checked = document.querySelector(input[name="${name}"]:checked);
+      const checked = document.querySelector(`input[name="${name}"]:checked`);
       return checked ? checked.value : "";
     }
 
@@ -605,25 +629,24 @@
       const anexoBase64 = document.getElementById("anexo_dce_base64");
       const anexoStatus = document.getElementById("anexoDceStatus");
 
-      if (docNota && docNota.checked) {
+      if (docNota.checked) {
         blocoNota.style.display = "block";
         blocoDce.style.display = "none";
         labelValor.textContent = "Nota fiscal - Valor (R$)";
-        if (anexo) anexo.value = "";
-        if (campoNota) campoNota.value = "";
+        anexo.value = "";
         anexoNome.value = "";
         anexoBase64.value = "";
         anexoStatus.textContent = "Nenhum arquivo anexado.";
-      } else if (docDce && docDce.checked) {
+      } else if (docDce.checked) {
         blocoNota.style.display = "none";
         blocoDce.style.display = "grid";
-        if (campoNota) campoNota.value = "";
+        campoNota.value = "";
         labelValor.textContent = "DC-e - Valor declarado (R$)";
       } else {
         blocoNota.style.display = "none";
         blocoDce.style.display = "none";
-        if (campoNota) campoNota.value = "";
-        if (anexo) anexo.value = "";
+        campoNota.value = "";
+        anexo.value = "";
         anexoNome.value = "";
         anexoBase64.value = "";
         anexoStatus.textContent = "Nenhum arquivo anexado.";
@@ -633,16 +656,14 @@
 
     function atualizarEstadoFrete() {
       const selecionado = document.querySelector('input[name="frete"]:checked');
-      const campoCnpjFrete = document.getElementById("cnpj_frete");
-      if (!campoCnpjFrete) return;
-
+      const campo = document.getElementById("cnpj_frete");
       if (selecionado && selecionado.value === "Pago na origem") {
-        campoCnpjFrete.value = "";
-        campoCnpjFrete.disabled = true;
-        campoCnpjFrete.style.backgroundColor = "#f0f0f0";
+        campo.value = "";
+        campo.disabled = true;
+        campo.style.backgroundColor = "#f0f0f0";
       } else {
-        campoCnpjFrete.disabled = false;
-        campoCnpjFrete.style.backgroundColor = "#dbe5f1";
+        campo.disabled = false;
+        campo.style.backgroundColor = "#dbe5f1";
       }
     }
 
@@ -650,9 +671,8 @@
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => {
-          const result = reader.result || "";
-          const base64 = String(result).split(",")[1] || "";
-          resolve(base64);
+          const result = String(reader.result || "");
+          resolve(result.split(",")[1] || "");
         };
         reader.onerror = reject;
         reader.readAsDataURL(file);
@@ -673,73 +693,71 @@
       data.tomador = getRadioValue("tomador");
       data.forma_entrega = getRadioValue("forma_entrega");
       data.tipo_documento = getRadioValue("tipo_documento");
-
       return data;
     }
 
     function montarRevisao() {
-      const reviewBox = document.getElementById("reviewBox");
       const d = coletarDados();
-      reviewBox.textContent = [
-        Nº coleta: ${d.numero_coleta || ""},
-        Tipo de serviço: ${d.tipo_servico || ""},
-        Pagamento frete: ${d.frete || ""},
-        Tomador: ${d.tomador || ""},
-        CNPJ tomador: ${d.cnpj_frete || ""},
-        Forma de entrega: ${d.forma_entrega || ""},
-        Local retirada: ${d.local_retirada || ""},
+      document.getElementById("reviewBox").textContent = [
+        `Nº coleta: ${d.numero_coleta || ""}`,
+        `Tipo de serviço: ${d.tipo_servico || ""}`,
+        `Pagamento frete: ${d.frete || ""}`,
+        `Tomador: ${d.tomador || ""}`,
+        `CNPJ tomador: ${d.cnpj_frete || ""}`,
+        `Forma de entrega: ${d.forma_entrega || ""}`,
+        `Local retirada: ${d.local_retirada || ""}`,
         ``,
-        REMETENTE,
-        Nome: ${d.remetente_nome || ""},
-        CPF/CNPJ: ${d.remetente_cpf_cnpj || ""},
-        Endereço: ${d.remetente_endereco || ""}, ${d.remetente_numero || ""},
-        Complemento: ${d.remetente_complemento || ""},
-        Cidade: ${d.remetente_cidade || ""},
-        CEP: ${d.remetente_cep || ""},
-        Telefone: ${d.remetente_telefone || ""},
+        `REMETENTE`,
+        `Nome: ${d.remetente_nome || ""}`,
+        `CPF/CNPJ: ${d.remetente_cpf_cnpj || ""}`,
+        `Endereço: ${d.remetente_endereco || ""}, ${d.remetente_numero || ""}`,
+        `Complemento: ${d.remetente_complemento || ""}`,
+        `Cidade: ${d.remetente_cidade || ""}`,
+        `CEP: ${d.remetente_cep || ""}`,
+        `Telefone: ${d.remetente_telefone || ""}`,
         ``,
-        DESTINATÁRIO,
-        Nome: ${d.destinatario_nome || ""},
-        CPF/CNPJ: ${d.destinatario_cpf_cnpj || ""},
-        Endereço: ${d.destinatario_endereco || ""}, ${d.destinatario_numero || ""},
-        Complemento: ${d.destinatario_complemento || ""},
-        Cidade: ${d.destinatario_cidade || ""},
-        CEP: ${d.destinatario_cep || ""},
-        Telefone: ${d.destinatario_telefone || ""},
+        `DESTINATÁRIO`,
+        `Nome: ${d.destinatario_nome || ""}`,
+        `CPF/CNPJ: ${d.destinatario_cpf_cnpj || ""}`,
+        `Endereço: ${d.destinatario_endereco || ""}, ${d.destinatario_numero || ""}`,
+        `Complemento: ${d.destinatario_complemento || ""}`,
+        `Cidade: ${d.destinatario_cidade || ""}`,
+        `CEP: ${d.destinatario_cep || ""}`,
+        `Telefone: ${d.destinatario_telefone || ""}`,
         ``,
-        CARGA,
-        Volumes: ${d.volumes || ""},
-        Peso (kg): ${d.peso_kg || ""},
-        Dimensões: ${d.dimensoes || ""},
-        Tipo embalagem: ${d.tipo_embalagem || ""},
-        Descrição: ${d.descricao_carga || ""},
+        `CARGA`,
+        `Volumes: ${d.volumes || ""}`,
+        `Peso (kg): ${d.peso_kg || ""}`,
+        `Dimensões: ${d.dimensoes || ""}`,
+        `Tipo embalagem: ${d.tipo_embalagem || ""}`,
+        `Descrição: ${d.descricao_carga || ""}`,
         ``,
-        DOCUMENTAÇÃO,
-        Tipo: ${d.tipo_documento || ""},
-        Valor: ${d.valor_documento || ""},
-        Número NF: ${d.numero_nota_fiscal || ""},
-        Anexo DC-e: ${d.anexo_dce_nome || ""},
+        `DOCUMENTAÇÃO`,
+        `Tipo: ${d.tipo_documento || ""}`,
+        `Valor: ${d.valor_documento || ""}`,
+        `Número NF: ${d.numero_nota_fiscal || ""}`,
+        `Anexo DC-e: ${d.anexo_dce_nome || ""}`,
         ``,
-        RESPONSÁVEL,
-        Local: ${d.responsavel_local || ""},
-        Data: ${d.responsavel_data || ""},
-        RG: ${d.responsavel_rg || ""},
-        Nome: ${d.responsavel_nome || ""},
+        `RESPONSÁVEL`,
+        `Local: ${d.responsavel_local || ""}`,
+        `Data: ${d.responsavel_data || ""}`,
+        `RG: ${d.responsavel_rg || ""}`,
+        `Nome: ${d.responsavel_nome || ""}`,
         ``,
-        Observações: ${d.observacoes || ""}
+        `Observações: ${d.observacoes || ""}`
       ].join("\n");
     }
 
     function mostrarStatus(tipo, texto) {
-      const statusBox = document.getElementById("statusBox");
-      statusBox.className = "status-box show " + (tipo === "success" ? "status-success" : "status-error");
-      statusBox.textContent = texto;
+      const box = document.getElementById("statusBox");
+      box.className = "status-box show " + (tipo === "success" ? "status-success" : "status-error");
+      box.textContent = texto;
     }
 
     function limparStatus() {
-      const statusBox = document.getElementById("statusBox");
-      statusBox.className = "status-box";
-      statusBox.textContent = "";
+      const box = document.getElementById("statusBox");
+      box.className = "status-box";
+      box.textContent = "";
     }
 
     function drawFilledRect(doc, x, y, w, h, color) {
@@ -773,14 +791,13 @@
 
       const fieldX = x + labelWidth;
       const fieldW = w - labelWidth - 1.2;
-
       if (fieldW > 2) {
         doc.setFillColor(220, 230, 241);
         doc.rect(fieldX, y + 1, fieldW, h - 2, "F");
       }
 
-      const textLines = doc.splitTextToSize(String(value || ""), Math.max(5, fieldW - 2));
-      doc.text(textLines.slice(0, 2), fieldX + 1.2, y + 4.2);
+      const lines = doc.splitTextToSize(String(value || ""), Math.max(5, fieldW - 2));
+      doc.text(lines.slice(0, 2), fieldX + 1.2, y + 4.2);
     }
 
     function drawCheckboxLine(doc, x, y, w, text, checked, valueText = "") {
@@ -805,7 +822,7 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF("p", "mm", "a4");
       const d = coletarDados();
-      const assinaturaInput = document.getElementById("assinatura_base64");
+      const assinaturaBase64 = document.getElementById("assinatura_base64").value || "";
 
       doc.setDrawColor(0, 0, 0);
       doc.setLineWidth(0.2);
@@ -839,7 +856,6 @@
       doc.setFillColor(220, 230, 241);
       doc.rect(pageX + 114.5, y + 6, 73, 5.5, "F");
       doc.text(String(d.numero_coleta || ""), pageX + 116, y + 10);
-
       y += 14;
 
       drawHeaderBar(doc, "1. TIPO DE SERVIÇO", pageX, y, pageW, 6);
@@ -868,7 +884,6 @@
 
       drawBorder(doc, pageX, y, 112, 14);
       drawBorder(doc, pageX + 112, y, 78, 14);
-
       doc.setFontSize(7.5);
       doc.text("Pagamento de Frete", pageX + 1.5, y + 4.2);
 
@@ -900,7 +915,6 @@
         doc.circle(pageX + 134, y + 9.8, 0.8, "F");
       }
       doc.text("Destinatário", pageX + 138, y + 10.5);
-
       y += 14;
 
       drawFieldCell(doc, pageX, y, pageW, 7, "CNPJ do Tomador", d.cnpj_frete || "", 38);
@@ -925,7 +939,7 @@
       doc.text("Retirada na unidade", pageX + 82, y + 4.2);
 
       if (d.local_retirada) {
-        doc.text(Local: ${d.local_retirada}, pageX + 132, y + 4.2);
+        doc.text(`Local: ${d.local_retirada}`, pageX + 132, y + 4.2);
       }
       y += 7;
 
@@ -1009,192 +1023,78 @@
       drawBorder(doc, pageX + 55, y, 135, 24);
       doc.setFontSize(7);
       doc.text("Assinatura", pageX + 57, y + 4);
-
-      const assinaturaBase64 = assinaturaInput.value || "";
       if (assinaturaBase64) {
-        try {
-          doc.addImage(assinaturaBase64, "PNG", pageX + 58, y + 5, 60, 16);
-        } catch (e) {}
+        try { doc.addImage(assinaturaBase64, "PNG", pageX + 58, y + 5, 60, 16); } catch {}
       }
 
       const arrayBuffer = doc.output("arraybuffer");
       const bytes = new Uint8Array(arrayBuffer);
       let binary = "";
-      for (let i = 0; i < bytes.byteLength; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
+      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
       const base64 = btoa(binary);
       document.getElementById("pdf_base64").value = base64;
-
       return { doc, base64 };
     }
 
     document.addEventListener("DOMContentLoaded", () => {
       detectarCelular();
 
-      const steps = document.querySelectorAll(".step");
-      const stepLabel = document.getElementById("wizardStepLabel");
-      const btnVoltar = document.getElementById("btnVoltar");
-      const btnProximo = document.getElementById("btnProximo");
-      const btnPdf = document.getElementById("btnPdf");
-      const btnEnviar = document.getElementById("btnEnviar");
-
-      let etapaAtual = 0;
-
-      function mostrarEtapa(index) {
-        steps.forEach((step, i) => {
-          step.classList.toggle("active-step", i === index);
-        });
-
-        stepLabel.textContent = Etapa ${index + 1} de ${steps.length};
-        btnVoltar.style.display = index === 0 ? "none" : "block";
-
-        const ultima = index === steps.length - 1;
-        btnProximo.style.display = ultima ? "none" : "block";
-        btnPdf.style.display = ultima ? "block" : "none";
-        btnEnviar.style.display = ultima ? "block" : "none";
-
-        if (ultima) montarRevisao();
-        limparStatus();
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-
-      btnVoltar.addEventListener("click", () => {
-        if (etapaAtual > 0) {
-          etapaAtual--;
-          mostrarEtapa(etapaAtual);
-        }
-      });
-
-      btnProximo.addEventListener("click", () => {
-        if (etapaAtual < steps.length - 1) {
-          etapaAtual++;
-          mostrarEtapa(etapaAtual);
-        }
-      });
+      document.getElementById("btnVoltar").addEventListener("click", prevStep);
+      document.getElementById("btnProximo").addEventListener("click", nextStep);
 
       document.querySelectorAll('input[name="tipo_documento"]').forEach(r => {
         r.addEventListener("change", toggleNumeroNotaFiscal);
       });
-
       document.querySelectorAll('input[name="frete"]').forEach(r => {
         r.addEventListener("change", atualizarEstadoFrete);
       });
 
-      document.querySelectorAll('input[name="forma_entrega"]').forEach(r => {
-        r.addEventListener("change", () => {
-          if (r.checked && r.value === "Retirada na unidade") toggleAero(true);
-          if (r.checked && r.value === "Entrega no endereço") toggleAero(false);
-        });
-      });
-
-      document.querySelectorAll(".cep").forEach(el => {
-        el.addEventListener("input", () => {
-          let v = el.value.replace(/\D/g, "").slice(0, 8);
-          v = v.replace(/(\d{5})(\d)/, "$1-$2");
-          el.value = v;
-        });
-      });
-
-      document.querySelectorAll(".cpf").forEach(el => {
-        el.addEventListener("input", () => {
-          let v = el.value.replace(/\D/g, "");
-          if (v.length <= 11) {
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-          } else {
-            v = v.slice(0, 14);
-            v = v.replace(/^(\d{2})(\d)/, "$1.$2");
-            v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-            v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
-            v = v.replace(/(\d{4})(\d)/, "$1-$2");
-          }
-          el.value = v;
-        });
-      });
-
-      document.querySelectorAll(".rg").forEach(el => {
-        el.addEventListener("input", () => {
-          let v = el.value.replace(/\D/g, "").slice(0, 9);
-          v = v.replace(/(\d{2})(\d)/, "$1.$2");
-          v = v.replace(/(\d{3})(\d)/, "$1.$2");
-          v = v.replace(/(\d{3})(\d)/, "$1-$2");
-          el.value = v;
-        });
-      });
-
-      document.querySelectorAll(".data").forEach(el => {
-        el.addEventListener("input", () => {
-          let v = el.value.replace(/\D/g, "").slice(0, 8);
-          v = v.replace(/(\d{2})(\d)/, "$1/$2");
-          v = v.replace(/(\d{2})(\d)/, "$1/$2");
-          el.value = v;
-        });
-      });
-
-      document.querySelectorAll(".money").forEach(el => {
-        el.addEventListener("input", () => {
-          let v = el.value.replace(/\D/g, "");
-          if (!v) {
-            el.value = "";
-            return;
-          }
-          v = (v / 100).toFixed(2);
-          v = v.replace(".", ",");
-          v = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-          el.value = "R$ " + v;
-        });
-      });
-
       const anexoDceInput = document.getElementById("anexo_dce");
-      const anexoDceNome = document.getElementById("anexo_dce_nome");
-      const anexoDceBase64 = document.getElementById("anexo_dce_base64");
-      const anexoDceStatus = document.getElementById("anexoDceStatus");
-
       anexoDceInput.addEventListener("change", async (event) => {
         const file = event.target.files && event.target.files[0];
+        const nome = document.getElementById("anexo_dce_nome");
+        const base = document.getElementById("anexo_dce_base64");
+        const status = document.getElementById("anexoDceStatus");
+
         if (!file) {
-          anexoDceNome.value = "";
-          anexoDceBase64.value = "";
-          anexoDceStatus.textContent = "Nenhum arquivo anexado.";
+          nome.value = "";
+          base.value = "";
+          status.textContent = "Nenhum arquivo anexado.";
           return;
         }
 
         try {
-          const base64 = await fileToBase64(file);
-          anexoDceNome.value = file.name;
-          anexoDceBase64.value = base64;
-          anexoDceStatus.textContent = Arquivo anexado: ${file.name};
+          base.value = await fileToBase64(file);
+          nome.value = file.name;
+          status.textContent = `Arquivo anexado: ${file.name}`;
         } catch {
-          anexoDceNome.value = "";
-          anexoDceBase64.value = "";
-          anexoDceStatus.textContent = "Falha ao processar o arquivo.";
+          nome.value = "";
+          base.value = "";
+          status.textContent = "Falha ao processar o arquivo.";
         }
       });
 
-      const assinaturaCanvas = document.getElementById("assinatura");
+      const canvas = document.getElementById("assinatura");
+      const ctx = canvas.getContext("2d");
       const assinaturaInput = document.getElementById("assinatura_base64");
-      const btnLimparAssinatura = document.getElementById("btnLimparAssinatura");
-      const assinaturaCtx = assinaturaCanvas.getContext("2d");
       let assinando = false;
 
-      function ajustarCanvasAssinatura() {
+      function ajustarCanvas() {
         const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        const rect = assinaturaCanvas.getBoundingClientRect();
-        assinaturaCanvas.width = rect.width * ratio;
-        assinaturaCanvas.height = rect.height * ratio;
-        assinaturaCtx.setTransform(1, 0, 0, 1, 0, 0);
-        assinaturaCtx.scale(ratio, ratio);
-        assinaturaCtx.lineWidth = 2;
-        assinaturaCtx.lineCap = "round";
-        assinaturaCtx.strokeStyle = "#000000";
-        assinaturaCtx.fillStyle = "#ffffff";
-        assinaturaCtx.fillRect(0, 0, rect.width, rect.height);
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * ratio;
+        canvas.height = rect.height * ratio;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(ratio, ratio);
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#000";
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, rect.width, rect.height);
       }
 
-      function getPos(evt) {
-        const rect = assinaturaCanvas.getBoundingClientRect();
+      function pos(evt) {
+        const rect = canvas.getBoundingClientRect();
         if (evt.touches && evt.touches[0]) {
           return {
             x: evt.touches[0].clientX - rect.left,
@@ -1207,57 +1107,57 @@
         };
       }
 
-      function iniciarAssinatura(evt) {
+      function startDraw(evt) {
         evt.preventDefault();
         assinando = true;
-        const pos = getPos(evt);
-        assinaturaCtx.beginPath();
-        assinaturaCtx.moveTo(pos.x, pos.y);
+        const p = pos(evt);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
       }
 
-      function moverAssinatura(evt) {
+      function moveDraw(evt) {
         if (!assinando) return;
         evt.preventDefault();
-        const pos = getPos(evt);
-        assinaturaCtx.lineTo(pos.x, pos.y);
-        assinaturaCtx.stroke();
+        const p = pos(evt);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
       }
 
-      function finalizarAssinatura(evt) {
+      function endDraw(evt) {
         if (!assinando) return;
         evt.preventDefault();
         assinando = false;
-        assinaturaCtx.beginPath();
-        assinaturaInput.value = assinaturaCanvas.toDataURL("image/png");
+        ctx.beginPath();
+        assinaturaInput.value = canvas.toDataURL("image/png");
       }
 
-      btnLimparAssinatura.addEventListener("click", () => {
-        ajustarCanvasAssinatura();
+      document.getElementById("btnLimparAssinatura").addEventListener("click", () => {
+        ajustarCanvas();
         assinaturaInput.value = "";
       });
 
-      assinaturaCanvas.addEventListener("mousedown", iniciarAssinatura);
-      assinaturaCanvas.addEventListener("mousemove", moverAssinatura);
-      assinaturaCanvas.addEventListener("mouseup", finalizarAssinatura);
-      assinaturaCanvas.addEventListener("mouseleave", finalizarAssinatura);
-      assinaturaCanvas.addEventListener("touchstart", iniciarAssinatura, { passive: false });
-      assinaturaCanvas.addEventListener("touchmove", moverAssinatura, { passive: false });
-      assinaturaCanvas.addEventListener("touchend", finalizarAssinatura, { passive: false });
+      canvas.addEventListener("mousedown", startDraw);
+      canvas.addEventListener("mousemove", moveDraw);
+      canvas.addEventListener("mouseup", endDraw);
+      canvas.addEventListener("mouseleave", endDraw);
+      canvas.addEventListener("touchstart", startDraw, { passive: false });
+      canvas.addEventListener("touchmove", moveDraw, { passive: false });
+      canvas.addEventListener("touchend", endDraw, { passive: false });
 
-      window.addEventListener("resize", ajustarCanvasAssinatura);
-      ajustarCanvasAssinatura();
+      window.addEventListener("resize", ajustarCanvas);
+      ajustarCanvas();
 
-      btnPdf.addEventListener("click", async () => {
+      document.getElementById("btnPdf").addEventListener("click", async () => {
         try {
           const { doc } = await gerarPdfBase64();
           const numero = document.getElementById("numero_coleta").value || "minuta";
-          doc.save(minuta-${numero}.pdf);
+          doc.save(`minuta-${numero}.pdf`);
         } catch {
           mostrarStatus("error", "Falha ao gerar PDF.");
         }
       });
 
-      btnEnviar.addEventListener("click", async () => {
+      document.getElementById("btnEnviar").addEventListener("click", async () => {
         try {
           const { base64 } = await gerarPdfBase64();
           const payload = coletarDados();
@@ -1273,12 +1173,8 @@
           });
 
           const result = await response.json();
-
-          if (!response.ok) {
-            throw new Error(result.error || "Falha ao enviar.");
-          }
-
-          mostrarStatus("success", Minuta enviada com sucesso. ID: ${result.id});
+          if (!response.ok) throw new Error(result.error || "Falha ao enviar.");
+          mostrarStatus("success", `Minuta enviada com sucesso. ID: ${result.id}`);
         } catch (e) {
           mostrarStatus("error", e.message || "Erro no envio.");
         }
@@ -1286,7 +1182,7 @@
 
       toggleNumeroNotaFiscal();
       atualizarEstadoFrete();
-      mostrarEtapa(etapaAtual);
+      showStep(etapaAtual);
     });
 
     window.addEventListener("load", detectarCelular);
