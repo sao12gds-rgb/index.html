@@ -293,6 +293,17 @@
       <div class="wizard-badge" id="wizardStepLabel">Etapa 1 de 12</div>
     </div>
 
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-body">
+        <div style="font-size:22px;font-weight:700;color:#0b2d5c;margin-bottom:6px;">
+          Minuta de Embarque
+        </div>
+        <div style="font-size:14px;line-height:1.5;color:#334155;">
+          Este formulário é utilizado para registrar as informações da carga, dados do remetente, destinatário, documentação e responsável, para viabilizar o embarque e a emissão dos documentos necessários ao transporte.
+        </div>
+      </div>
+    </div>
+
     <form id="minutaForm">
       <input type="hidden" name="tipo_dispositivo" id="tipo_dispositivo">
       <input type="hidden" name="largura_tela" id="largura_tela">
@@ -584,7 +595,7 @@
         step.classList.toggle("active-step", i === index);
       });
 
-      badge.textContent = `Etapa ${index + 1} de ${steps.length}`;
+      badge.textContent = Etapa ${index + 1} de ${steps.length};
       btnVoltar.style.display = index === 0 ? "none" : "block";
 
       const ultima = index === steps.length - 1;
@@ -651,7 +662,7 @@
     }
 
     function getRadioValue(name) {
-      const checked = document.querySelector(`input[name="${name}"]:checked`);
+      const checked = document.querySelector(input[name="${name}"]:checked);
       return checked ? checked.value : "";
     }
 
@@ -747,53 +758,53 @@
     function montarRevisao() {
       const d = coletarDados();
       document.getElementById("reviewBox").textContent = [
-        `Nº coleta: ${d.numero_coleta || ""}`,
-        `Tipo de serviço: ${d.tipo_servico || ""}`,
-        `Pagamento frete: ${d.frete || ""}`,
-        `Tomador: ${d.tomador || ""}`,
-        `CNPJ tomador: ${d.cnpj_frete || ""}`,
-        `Forma de entrega: ${d.forma_entrega || ""}`,
-        `Local retirada: ${d.local_retirada || ""}`,
+        Nº coleta: ${d.numero_coleta || ""},
+        Tipo de serviço: ${d.tipo_servico || ""},
+        Pagamento frete: ${d.frete || ""},
+        Tomador: ${d.tomador || ""},
+        CNPJ tomador: ${d.cnpj_frete || ""},
+        Forma de entrega: ${d.forma_entrega || ""},
+        Local retirada: ${d.local_retirada || ""},
         ``,
-        `REMETENTE`,
-        `Nome: ${d.remetente_nome || ""}`,
-        `CPF/CNPJ: ${d.remetente_cpf_cnpj || ""}`,
-        `Endereço: ${d.remetente_endereco || ""}, ${d.remetente_numero || ""}`,
-        `Complemento: ${d.remetente_complemento || ""}`,
-        `Cidade: ${d.remetente_cidade || ""}`,
-        `CEP: ${d.remetente_cep || ""}`,
-        `Telefone: ${d.remetente_telefone || ""}`,
+        REMETENTE,
+        Nome: ${d.remetente_nome || ""},
+        CPF/CNPJ: ${d.remetente_cpf_cnpj || ""},
+        Endereço: ${d.remetente_endereco || ""}, ${d.remetente_numero || ""},
+        Complemento: ${d.remetente_complemento || ""},
+        Cidade: ${d.remetente_cidade || ""},
+        CEP: ${d.remetente_cep || ""},
+        Telefone: ${d.remetente_telefone || ""},
         ``,
-        `DESTINATÁRIO`,
-        `Nome: ${d.destinatario_nome || ""}`,
-        `CPF/CNPJ: ${d.destinatario_cpf_cnpj || ""}`,
-        `Endereço: ${d.destinatario_endereco || ""}, ${d.destinatario_numero || ""}`,
-        `Complemento: ${d.destinatario_complemento || ""}`,
-        `Cidade: ${d.destinatario_cidade || ""}`,
-        `CEP: ${d.destinatario_cep || ""}`,
-        `Telefone: ${d.destinatario_telefone || ""}`,
+        DESTINATÁRIO,
+        Nome: ${d.destinatario_nome || ""},
+        CPF/CNPJ: ${d.destinatario_cpf_cnpj || ""},
+        Endereço: ${d.destinatario_endereco || ""}, ${d.destinatario_numero || ""},
+        Complemento: ${d.destinatario_complemento || ""},
+        Cidade: ${d.destinatario_cidade || ""},
+        CEP: ${d.destinatario_cep || ""},
+        Telefone: ${d.destinatario_telefone || ""},
         ``,
-        `CARGA`,
-        `Volumes: ${d.volumes || ""}`,
-        `Peso (kg): ${d.peso_kg || ""}`,
-        `Dimensões: ${d.dimensoes || ""}`,
-        `Tipo embalagem: ${d.tipo_embalagem || ""}`,
-        `Descrição: ${d.descricao_carga || ""}`,
+        CARGA,
+        Volumes: ${d.volumes || ""},
+        Peso (kg): ${d.peso_kg || ""},
+        Dimensões: ${d.dimensoes || ""},
+        Tipo embalagem: ${d.tipo_embalagem || ""},
+        Descrição: ${d.descricao_carga || ""},
         ``,
-        `DOCUMENTAÇÃO`,
-        `Tipo: ${d.tipo_documento || ""}`,
-        `Valor: ${d.valor_documento || ""}`,
-        `Número NF: ${d.numero_nota_fiscal || ""}`,
-        `Número DC-e: ${d.numero_dce || ""}`,
-        `Anexo DC-e: ${d.anexo_dce_nome || ""}`,
+        DOCUMENTAÇÃO,
+        Tipo: ${d.tipo_documento || ""},
+        Valor: ${d.valor_documento || ""},
+        Número NF: ${d.numero_nota_fiscal || ""},
+        Número DC-e: ${d.numero_dce || ""},
+        Anexo DC-e: ${d.anexo_dce_nome || ""},
         ``,
-        `RESPONSÁVEL`,
-        `Local: ${d.responsavel_local || ""}`,
-        `Data: ${d.responsavel_data || ""}`,
-        `RG: ${d.responsavel_rg || ""}`,
-        `Nome: ${d.responsavel_nome || ""}`,
+        RESPONSÁVEL,
+        Local: ${d.responsavel_local || ""},
+        Data: ${d.responsavel_data || ""},
+        RG: ${d.responsavel_rg || ""},
+        Nome: ${d.responsavel_nome || ""},
         ``,
-        `Observações: ${d.observacoes || ""}`
+        Observações: ${d.observacoes || ""}
       ].join("\n");
     }
 
@@ -1003,7 +1014,7 @@
       doc.text("Retirada na unidade", pageX + 82, y + 4.2);
 
       if (d.local_retirada) {
-        doc.text(`Local: ${d.local_retirada}`, pageX + 132, y + 4.2);
+        doc.text(Local: ${d.local_retirada}, pageX + 132, y + 4.2);
       }
       y += 7;
 
@@ -1185,7 +1196,7 @@
         try {
           base.value = await fileToBase64(file);
           nome.value = file.name;
-          status.textContent = `Arquivo anexado: ${file.name}`;
+          status.textContent = Arquivo anexado: ${file.name};
         } catch {
           nome.value = "";
           base.value = "";
@@ -1270,7 +1281,7 @@
         try {
           const { doc } = await gerarPdfBase64();
           const numero = document.getElementById("numero_coleta").value || "minuta";
-          doc.save(`minuta-${numero}.pdf`);
+          doc.save(minuta-${numero}.pdf);
         } catch {
           mostrarStatus("error", "Falha ao gerar PDF.");
         }
@@ -1293,7 +1304,7 @@
 
           const result = await response.json();
           if (!response.ok) throw new Error(result.error || "Falha ao enviar.");
-          mostrarStatus("success", `Minuta enviada com sucesso. ID: ${result.id}`);
+          mostrarStatus("success", Minuta enviada com sucesso. ID: ${result.id});
         } catch (e) {
           mostrarStatus("error", e.message || "Erro no envio.");
         }
