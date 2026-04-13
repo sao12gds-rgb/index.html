@@ -1,1322 +1,1332 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Minuta Azul</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<style>
-* { box-sizing: border-box; }
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  background: #eef1f5;
-  font-family: Arial, sans-serif;
-  color: #111827;
-}
-body.mobile-device { background: #fff; }
-.page {
-  max-width: 920px;
-  margin: 0 auto;
-  background: #fff;
-  min-height: 100vh;
-  padding: 16px;
-}
-.wizard-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-  flex-wrap: wrap;
-}
-.wizard-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.wizard-logo {
-  height: 44px;
-  width: auto;
-  display: block;
-  object-fit: contain;
-}
-.wizard-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #0b2d5c;
-}
-.wizard-badge {
-  background: #0b2d5c;
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 700;
-}
-.step { display: none; }
-.step.active-step { display: block; }
-.card {
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 14px;
-  background: #fff;
-}
-.card-header {
-  background: #0b2d5c;
-  color: #fff;
-  padding: 12px;
-  font-weight: 700;
-  font-size: 14px;
-}
-.card-body { padding: 14px; }
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-.grid-1 {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-.grid-3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.field label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #111827;
-}
-input, select, textarea {
-  width: 100%;
-  min-height: 42px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  background: #dbe5f1;
-  padding: 10px 12px;
-  font-size: 14px;
-  outline: none;
-}
-input[type="file"] {
-  background: #fff;
-  padding: 8px;
-}
-textarea {
-  min-height: 110px;
-  resize: vertical;
-}
-.radio-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 18px;
-  align-items: center;
-  min-height: 42px;
-  padding: 8px 0;
-}
-.radio-option {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-}
-input[type="radio"] {
-  width: auto;
-  min-height: auto;
-  accent-color: #0b2d5c;
-  transform: scale(1.1);
-}
-.wizard-nav {
-  position: sticky;
-  bottom: 0;
-  background: #fff;
-  display: flex;
-  gap: 10px;
-  padding-top: 12px;
-  margin-top: 10px;
-  border-top: 1px solid #e5e7eb;
-}
-.wizard-nav button {
-  flex: 1;
-  min-height: 48px;
-  border: none;
-  border-radius: 8px;
-  background: #0b2d5c;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.wizard-nav button.secondary { background: #64748b; }
-.wizard-nav button.success { background: #166534; }
-#btnPdf, #btnEnviar { display: none; }
-.status-box {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  display: none;
-}
-.status-box.show { display: block; }
-.status-success {
-  background: #dcfce7;
-  color: #166534;
-  border: 1px solid #86efac;
-}
-.status-error {
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fca5a5;
-}
-.review-box {
-  border: 1px dashed #94a3b8;
-  border-radius: 8px;
-  padding: 12px;
-  background: #f8fafc;
-  font-size: 13px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-}
-.muted {
-  color: #64748b;
-  font-size: 12px;
-}
-.signature-wrap {
-  width: 100%;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  background: #fff;
-  overflow: hidden;
-}
-.signature-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f8fafc;
-}
-.signature-toolbar button {
-  border: none;
-  background: #64748b;
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 700;
-  width: auto;
-  min-height: auto;
-}
-.signature-canvas-box {
-  width: 100%;
-  overflow: hidden;
-  background: #fff;
-}
-#assinatura {
-  width: 100%;
-  height: 180px;
-  display: block;
-  background: #fff;
-  touch-action: none;
-}
-.app-links-box {
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  background: #f8fafc;
-  padding: 12px;
-}
-.app-links-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #0b2d5c;
-  margin-bottom: 10px;
-}
-.app-links-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-.store-link {
-  display: block;
-  text-decoration: none;
-  border-radius: 10px;
-  padding: 12px;
-  background: #0b69c7;
-  color: #fff;
-  border: 2px solid #0b69c7;
-  text-align: center;
-  font-weight: 700;
-}
-.store-link small {
-  display: block;
-  font-size: 11px;
-  font-weight: 400;
-  opacity: 0.95;
-  margin-bottom: 4px;
-}
-.store-link strong {
-  display: block;
-  font-size: 16px;
-  line-height: 1.2;
-}
-.file-note {
-  font-size: 12px;
-  color: #334155;
-}
-@media (max-width: 768px) {
-  .page { padding: 12px; }
-  .grid, .grid-3, .app-links-grid { grid-template-columns: 1fr; }
-  input, select, textarea { font-size: 16px; }
-  .wizard-title { font-size: 16px; }
-  .wizard-logo { height: 38px; }
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minuta Azul</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      background: #eef1f5;
+      font-family: Arial, sans-serif;
+      color: #111827;
+    }
+    body.mobile-device { background: #fff; }
+    .page {
+      max-width: 920px;
+      margin: 0 auto;
+      background: #fff;
+      min-height: 100vh;
+      padding: 16px;
+    }
+    .wizard-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .wizard-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .wizard-logo {
+      height: 44px;
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+    .wizard-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0b2d5c;
+    }
+    .wizard-badge {
+      background: #0b2d5c;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .step { display: none; }
+    .step.active-step { display: block; }
+    .card {
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      background: #fff;
+    }
+    .card-header {
+      background: #0b2d5c;
+      color: #fff;
+      padding: 12px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .card-body { padding: 14px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .grid-1 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #111827;
+    }
+    input, select, textarea {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #dbe5f1;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+    input[type="file"] {
+      background: #fff;
+      padding: 8px;
+    }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 18px;
+      align-items: center;
+      min-height: 42px;
+      padding: 8px 0;
+    }
+    .radio-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+    input[type="radio"] {
+      width: auto;
+      min-height: auto;
+      accent-color: #0b2d5c;
+      transform: scale(1.1);
+    }
+    .wizard-nav {
+      position: sticky;
+      bottom: 0;
+      background: #fff;
+      display: flex;
+      gap: 10px;
+      padding-top: 12px;
+      margin-top: 10px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .wizard-nav button {
+      flex: 1;
+      min-height: 48px;
+      border: none;
+      border-radius: 8px;
+      background: #0b2d5c;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .wizard-nav button.secondary { background: #64748b; }
+    .wizard-nav button.success { background: #166534; }
+    #btnPdf, #btnEnviar { display: none; }
+    .status-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      display: none;
+    }
+    .status-box.show { display: block; }
+    .status-success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
+    .status-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+    .review-box {
+      border: 1px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 12px;
+      background: #f8fafc;
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+    .muted {
+      color: #64748b;
+      font-size: 12px;
+    }
+    .signature-wrap {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .signature-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f8fafc;
+    }
+    .signature-toolbar button {
+      border: none;
+      background: #64748b;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      width: auto;
+      min-height: auto;
+    }
+    .signature-canvas-box {
+      width: 100%;
+      overflow: hidden;
+      background: #fff;
+    }
+    #assinatura {
+      width: 100%;
+      height: 180px;
+      display: block;
+      background: #fff;
+      touch-action: none;
+    }
+    .app-links-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 12px;
+    }
+    .app-links-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0b2d5c;
+      margin-bottom: 10px;
+    }
+    .app-links-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .store-link {
+      display: block;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 12px;
+      background: #0b69c7;
+      color: #fff;
+      border: 2px solid #0b69c7;
+      text-align: center;
+      font-weight: 700;
+    }
+    .store-link small {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      opacity: 0.95;
+      margin-bottom: 4px;
+    }
+    .store-link strong {
+      display: block;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+    .file-note {
+      font-size: 12px;
+      color: #334155;
+    }
+    @media (max-width: 768px) {
+      .page { padding: 12px; }
+      .grid, .grid-3, .app-links-grid { grid-template-columns: 1fr; }
+      input, select, textarea { font-size: 16px; }
+      .wizard-title { font-size: 16px; }
+      .wizard-logo { height: 38px; }
+    }
+  </style>
 </head>
 <body>
-<div class="page">
-  <div class="wizard-top">
-    <div class="wizard-brand">
-      <img id="logoAzul" class="wizard-logo" src="logo-azulcargo.png" alt="Azul Cargo">
+  <div class="page">
+    <div class="wizard-top">
+      <div class="wizard-brand">
+        <img id="logoAzul" class="wizard-logo" src="logo-azulcargo.png" alt="Azul Cargo">
+      </div>
+      <div class="wizard-badge" id="wizardStepLabel">Etapa 1 de 12</div>
     </div>
-    <div class="wizard-badge" id="wizardStepLabel">Etapa 1 de 12</div>
-  </div>
 
-  <div class="card" style="margin-bottom:14px;">
-    <div class="card-body">
-      <div style="font-size:22px;font-weight:700;color:#0b2d5c;margin-bottom:6px;">
-        Minuta de Embarque
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-body">
+        <div style="font-size:22px;font-weight:700;color:#0b2d5c;margin-bottom:6px;">
+          Minuta de Embarque
+        </div>
+        <div style="font-size:14px;line-height:1.5;color:#334155;">
+          Este formulário é utilizado para registrar as informações da carga, dados do remetente, destinatário, documentação e responsável, para viabilizar o embarque e a emissão dos documentos necessários ao transporte.
+        </div>
       </div>
-      <div style="font-size:14px;line-height:1.5;color:#334155;">
-        Este formulário é utilizado para registrar as informações da carga, dados do remetente, destinatário, documentação e responsável, para viabilizar o embarque e a emissão dos documentos necessários ao transporte.
-      </div>
+    </div>
+
+    <form id="minutaForm">
+      <input type="hidden" name="tipo_dispositivo" id="tipo_dispositivo">
+      <input type="hidden" name="largura_tela" id="largura_tela">
+      <input type="hidden" name="altura_tela" id="altura_tela">
+      <input type="hidden" name="user_agent" id="user_agent">
+      <input type="hidden" name="pdf_base64" id="pdf_base64">
+      <input type="hidden" name="assinatura_base64" id="assinatura_base64">
+      <input type="hidden" name="anexo_dce_nome" id="anexo_dce_nome">
+      <input type="hidden" name="anexo_dce_base64" id="anexo_dce_base64">
+
+      <section class="step active-step">
+        <div class="card">
+          <div class="card-header">1. Identificação</div>
+          <div class="card-body">
+            <div class="grid">
+              <div class="field">
+                <label for="numero_coleta">Nº da coleta</label>
+                <input id="numero_coleta" name="numero_coleta" type="text">
+              </div>
+              <div class="field">
+                <label>Tipo de serviço</label>
+                <div class="radio-group">
+                  <label class="radio-option"><input type="radio" name="tipo_servico" value="Expresso">Expresso</label>
+                  <label class="radio-option"><input type="radio" name="tipo_servico" value="Premium">Premium</label>
+                  <label class="radio-option"><input type="radio" name="tipo_servico" value="Ecommerce">Ecommerce</label>
+                  <label class="radio-option"><input type="radio" name="tipo_servico" value="Standard">Standard</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="card">
+          <div class="card-header">2. Pagamento de frete / tomador</div>
+          <div class="card-body">
+            <div class="grid">
+              <div class="field">
+                <label>Pagamento de frete</label>
+                <div class="radio-group">
+                  <label class="radio-option"><input type="radio" name="frete" value="Pago na origem" checked>Pago na origem</label>
+                  <label class="radio-option"><input type="radio" name="frete" value="Cliente correntista">Cliente correntista</label>
+                </div>
+              </div>
+              <div class="field">
+                <label>Tomador</label>
+                <div class="radio-group">
+                  <label class="radio-option"><input type="radio" name="tomador" value="Remetente">Remetente</label>
+                  <label class="radio-option"><input type="radio" name="tomador" value="Destinatário">Destinatário</label>
+                </div>
+              </div>
+            </div>
+            <div class="grid-1">
+              <div class="field">
+                <label for="cnpj_frete">CNPJ do tomador</label>
+                <input id="cnpj_frete" name="cnpj_frete" maxlength="18" placeholder="00.000.000/0000-00" type="text">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="card">
+          <div class="card-header">3. Forma de entrega</div>
+          <div class="card-body">
+            <div class="field">
+              <label>Forma de entrega</label>
+              <div class="radio-group">
+                <label class="radio-option"><input type="radio" name="forma_entrega" value="Entrega no endereço" onclick="toggleAero(false)">Entrega no endereço</label>
+                <label class="radio-option"><input type="radio" name="forma_entrega" value="Retirada na unidade" onclick="toggleAero(true)">Retirada na unidade</label>
+              </div>
+            </div>
+            <div class="field" id="blocoAeroporto" style="display:none;">
+              <label for="local_retirada">Local retirada</label>
+              <input list="listaAero" id="local_retirada" name="local_retirada">
+              <datalist id="listaAero">
+                <option value="AAX"><option value="AFL"><option value="AJU"><option value="BEL">
+                <option value="BSB"><option value="CGB"><option value="CGH"><option value="CNF">
+                <option value="CWB"><option value="FLN"><option value="FOR"><option value="GIG">
+                <option value="GRU"><option value="GYN"><option value="IGU"><option value="JPA">
+                <option value="MAO"><option value="MCZ"><option value="NAT"><option value="POA">
+                <option value="PVH"><option value="REC"><option value="SDU"><option value="SSA">
+                <option value="VCP"><option value="VIX"><option value="CDSP1"><option value="CDSP2">
+              </datalist>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="card">
+          <div class="card-header">4. Remetente</div>
+          <div class="card-body">
+            <div class="grid">
+              <div class="field"><label for="remetente_nome">Nome</label><input id="remetente_nome" name="remetente_nome" type="text"></div>
+              <div class="field"><label for="remetente_cpf_cnpj">CPF/CNPJ</label><input id="remetente_cpf_cnpj" class="cpf-cnpj" name="remetente_cpf_cnpj" type="text"></div>
+              <div class="field"><label for="remetente_endereco">Endereço</label><input id="remetente_endereco" name="remetente_endereco" type="text"></div>
+              <div class="field"><label for="remetente_numero">Nº</label><input id="remetente_numero" name="remetente_numero" type="text"></div>
+              <div class="field"><label for="remetente_complemento">Complemento</label><input id="remetente_complemento" name="remetente_complemento" type="text"></div>
+              <div class="field"><label for="remetente_cidade">Cidade</label><input id="remetente_cidade" name="remetente_cidade" type="text"></div>
+              <div class="field"><label for="remetente_cep">CEP</label><input id="remetente_cep" class="cep" name="remetente_cep" type="text"></div>
+              <div class="field"><label for="remetente_telefone">Telefone</label><input id="remetente_telefone" name="remetente_telefone" type="text"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="card">
+          <div class="card-header">5. Destinatário</div>
+          <div class="card-body">
+            <div class="grid">
+              <div class="field"><label for="destinatario_nome">Nome</label><input id="destinatario_nome" name="destinatario_nome" type="text"></div>
+              <div class="field"><label for="destinatario_cpf_cnpj">CPF/CNPJ</label><input id="destinatario_cpf_cnpj" class="cpf-cnpj" name="destinatario_cpf_cnpj" type="text"></div>
+              <div class="field"><label for="destinatario_endereco">Endereço</label><input id="destinatario_endereco" name="destinatario_endereco" type="text"></div>
+              <div class="field"><label for="destinatario_numero">Nº</label><input id="destinatario_numero" name="destinatario_numero" type="text"></div>
+              <div class="field"><label for="destinatario_complemento">Complemento</label><input id="destinatario_complemento" name="destinatario_complemento" type="text"></div>
+              <div class="field"><label for="destinatario_cidade">Cidade</label><input id="destinatario_cidade" name="destinatario_cidade" type="text"></div>
+              <div class="field"><label for="destinatario_cep">CEP</label><input id="destinatario_cep" class="cep" name="destinatario_cep" type="text"></div>
+              <div class="field"><label for="destinatario_telefone">Telefone</label><input id="destinatario_telefone" name="destinatario_telefone" type="text"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="card">
+          <div class="card-header">6. Informações da carga</div>
+          <div class="card-body">
+            <div class="grid-3">
+              <div class="field"><label for="volumes">Volumes</label><input id="volumes" name="volumes" type="text"></div>
+              <div class="field"><label for="peso_kg">Peso (kg)</label><input id="peso_kg" name="peso_kg" type="text"></div>
+              <div class="field"><label for="dimensoes">Dimensões</label><input id="dimensoes" name="dimensoes" type="text"></div>
+            </div>
+            <div class="grid">
+              <div class="field"><label for="tipo_embalagem">Tipo de embalagem</label><input id="tipo_embalagem" name="tipo_embalagem" type="text"></div>
+              <div class="field"><label for="descricao_carga">Descrição</label><input id="descricao_carga" name="descricao_carga" type="text"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="card">
+          <div class="card-header">7. Documentação</div>
+          <div class="card-body">
+            <div class="grid">
+              <div class="field">
+                <label>Documento</label>
+                <div class="radio-group">
+                  <label class="radio-option"><input type="radio" name="tipo_documento" id="docNotaFiscal" value="Nota fiscal">Nota fiscal</label>
+                  <label class="radio-option"><input type="radio" name="tipo_documento" id="docDeclaracao" value="DC-e">DC-e</label>
+                </div>
+              </div>
+              <div class="field">
+                <label id="labelValorDocumento" for="valor_documento">Nota fiscal - Valor (R$)</label>
+                <input id="valor_documento" class="money" name="valor_documento" type="text">
+              </div>
+            </div>
+
+            <div class="grid-1" id="blocoNumeroNota" style="display:none;">
+              <div class="field">
+                <label for="numero_nota_fiscal">Número da nota fiscal</label>
+                <input id="numero_nota_fiscal" name="numero_nota_fiscal" type="text" placeholder="Digite o número da nota fiscal">
+              </div>
+            </div>
+
+            <div class="grid-1" id="blocoDce" style="display:none;">
+              <div class="field">
+                <label for="numero_dce">Número do DC-e</label>
+                <input id="numero_dce" name="numero_dce" type="text" placeholder="Digite o número do DC-e">
+              </div>
+
+              <div class="app-links-box">
+                <div class="app-links-title">Baixe o aplicativo para emitir o DC-e</div>
+                <div class="app-links-grid">
+                  <a id="appStoreLink" class="store-link" href="https://apps.apple.com/br/app/dce/id6753601602" target="_blank" rel="noopener noreferrer">
+                    <small>Disponível na</small>
+                    <strong>App Store</strong>
+                  </a>
+                  <a id="playStoreLink" class="store-link" href="https://play.google.com/store/apps/details?id=br.gov.pr.celepar.sefa.dce&hl=pt_BR" target="_blank" rel="noopener noreferrer">
+                    <small>Disponível no</small>
+                    <strong>Google Play</strong>
+                  </a>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="anexo_dce">Anexar DC-e</label>
+                <input id="anexo_dce" name="anexo_dce" type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                <div class="file-note" id="anexoDceStatus">Nenhum arquivo anexado.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="card">
+          <div class="card-header">8. Declaração</div>
+          <div class="card-body">
+            <div class="field">
+              <label for="declaracao_texto">Texto da declaração</label>
+              <textarea id="declaracao_texto" name="declaracao_texto">Autorizo a emissão do conhecimento aéreo e o transporte do(s) volume(s) conforme especificações acima neste documento, responsabilizando-me por eventuais atrasos ou prejuizos decorrentes de informações incorretas ou incompletas nesta minuta. Declaro que: O(s) volume(s) foi(foram) submetido(s) a controles de segurança apropriados até o momento da entrega à Azul Linhas Aereas Brasileiras S.A. Até o momento da entrega à Azul Linhas Aereas Brasileiras S.A., o(s) volume(s) foi(foram) manuseados por pessoas devidamente autorizadas e treinadas para identificar artigos proibidos e/ou perigosos para o transporte aéreo, e nenhum deles apresenta historico criminal junto às autoridades policiais. O(s) volume(s) foi(foram) devidamente conferido(s) e inspecionado(s) e está(ão) de acordo com a descrição contida no documento fiscal correspondente, cujas informações integrarão o Conhecimento Aéreo-AWB. O(s) volume(s) está(ão) acondicionado(s) em embalagem(ns) adequada(s) para garantir a sua preservação durante o transporte até sua entrega ao destinatario. Quaisquer irregularidades identificadas no(s) volume(s) serão imediatamente comunicadas à Azul Linhas Aereas Brasileiras S.A. Afirmo que o(s) volume(s) apresentado(s) NÃO CONTEM nenhum dos itens abaixo, pois estou ciente de que são PROIBIDOS PARA TRANSPORTE PELA AZUL. Artigo Perigoso à segurança do transporte aereo (conforme classificação da ONU). Documento de Licitação; Animal Vivo; Carga Valor (acima de R$ 5.000,00/kg) ou Vulneravel, sem autorização prévia da Azul Cargo para aceitação.</textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="card">
+          <div class="card-header">9. Responsável</div>
+          <div class="card-body">
+            <div class="grid">
+              <div class="field"><label for="responsavel_local">Local</label><input id="responsavel_local" name="responsavel_local" type="text"></div>
+              <div class="field"><label for="responsavel_data">Data</label><input id="responsavel_data" class="data" name="responsavel_data" type="text"></div>
+              <div class="field"><label for="responsavel_rg">RG</label><input id="responsavel_rg" class="rg" name="responsavel_rg" type="text"></div>
+              <div class="field"><label for="responsavel_nome">Nome</label><input id="responsavel_nome" name="responsavel_nome" type="text"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="card">
+          <div class="card-header">10. Observações finais</div>
+          <div class="card-body">
+            <div class="field">
+              <label for="observacoes">Observações</label>
+              <textarea id="observacoes" name="observacoes"></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="card">
+          <div class="card-header">11. Assinatura digital</div>
+          <div class="card-body">
+            <div class="field">
+              <label>Assinatura do responsável</label>
+              <div class="signature-wrap">
+                <div class="signature-toolbar">
+                  <span class="muted">Assine com dedo, mouse ou caneta</span>
+                  <button type="button" id="btnLimparAssinatura">Limpar assinatura</button>
+                </div>
+                <div class="signature-canvas-box">
+                  <canvas id="assinatura"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="card">
+          <div class="card-header">12. Revisão final</div>
+          <div class="card-body">
+            <div class="review-box" id="reviewBox"></div>
+            <div id="statusBox" class="status-box"></div>
+          </div>
+        </div>
+      </section>
+    </form>
+
+    <div class="wizard-nav">
+      <button type="button" id="btnVoltar" class="secondary" onclick="prevStep()">Voltar</button>
+      <button type="button" id="btnProximo" onclick="nextStep()">Próximo</button>
+      <button type="button" id="btnPdf" onclick="baixarPdf()">Baixar PDF</button>
+      <button type="button" id="btnEnviar" class="success" onclick="enviarMinuta()">Enviar</button>
     </div>
   </div>
 
-  <form id="minutaForm">
-    <input type="hidden" name="tipo_dispositivo" id="tipo_dispositivo">
-    <input type="hidden" name="largura_tela" id="largura_tela">
-    <input type="hidden" name="altura_tela" id="altura_tela">
-    <input type="hidden" name="user_agent" id="user_agent">
-    <input type="hidden" name="pdf_base64" id="pdf_base64">
-    <input type="hidden" name="assinatura_base64" id="assinatura_base64">
-    <input type="hidden" name="anexo_dce_nome" id="anexo_dce_nome">
-    <input type="hidden" name="anexo_dce_base64" id="anexo_dce_base64">
-
-    <section class="step active-step">
-      <div class="card">
-        <div class="card-header">1. Identificação</div>
-        <div class="card-body">
-          <div class="grid">
-            <div class="field">
-              <label for="numero_coleta">Nº da coleta</label>
-              <input id="numero_coleta" name="numero_coleta" type="text">
-            </div>
-            <div class="field">
-              <label>Tipo de serviço</label>
-              <div class="radio-group">
-                <label class="radio-option"><input type="radio" name="tipo_servico" value="Expresso">Expresso</label>
-                <label class="radio-option"><input type="radio" name="tipo_servico" value="Premium">Premium</label>
-                <label class="radio-option"><input type="radio" name="tipo_servico" value="Ecommerce">Ecommerce</label>
-                <label class="radio-option"><input type="radio" name="tipo_servico" value="Standard">Standard</label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="step">
-      <div class="card">
-        <div class="card-header">2. Pagamento de frete / tomador</div>
-        <div class="card-body">
-          <div class="grid">
-            <div class="field">
-              <label>Pagamento de frete</label>
-              <div class="radio-group">
-                <label class="radio-option"><input type="radio" name="frete" value="Pago na origem" checked>Pago na origem</label>
-                <label class="radio-option"><input type="radio" name="frete" value="Cliente correntista">Cliente correntista</label>
-              </div>
-            </div>
-            <div class="field">
-              <label>Tomador</label>
-              <div class="radio-group">
-                <label class="radio-option"><input type="radio" name="tomador" value="Remetente">Remetente</label>
-                <label class="radio-option"><input type="radio" name="tomador" value="Destinatário">Destinatário</label>
-              </div>
-            </div>
-          </div>
-          <div class="grid-1">
-            <div class="field">
-              <label for="cnpj_frete">CNPJ do tomador</label>
-              <input id="cnpj_frete" name="cnpj_frete" maxlength="18" placeholder="00.000.000/0000-00" type="text">
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="step">
-      <div class="card">
-        <div class="card-header">3. Forma de entrega</div>
-        <div class="card-body">
-          <div class="field">
-            <label>Forma de entrega</label>
-            <div class="radio-group">
-              <label class="radio-option"><input type="radio" name="forma_entrega" value="Entrega no endereço" onclick="toggleAero(false)">Entrega no endereço</label>
-              <label class="radio-option"><input type="radio" name="forma_entrega" value="Retirada na unidade" onclick="toggleAero(true)">Retirada na unidade</label>
-            </div>
-          </div>
-          <div class="field" id="blocoAeroporto" style="display:none;">
-            <label for="local_retirada">Local retirada</label>
-            <input list="listaAero" id="local_retirada" name="local_retirada">
-            <datalist id="listaAero">
-              <option value="AAX"><option value="AFL"><option value="AJU"><option value="BEL">
-              <option value="BSB"><option value="CGB"><option value="CGH"><option value="CNF">
-              <option value="CWB"><option value="FLN"><option value="FOR"><option value="GIG">
-              <option value="GRU"><option value="GYN"><option value="IGU"><option value="JPA">
-              <option value="MAO"><option value="MCZ"><option value="NAT"><option value="POA">
-              <option value="PVH"><option value="REC"><option value="SDU"><option value="SSA">
-              <option value="VCP"><option value="VIX"><option value="CDSP1"><option value="CDSP2">
-            </datalist>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="step">
-      <div class="card">
-        <div class="card-header">4. Remetente</div>
-        <div class="card-body">
-          <div class="grid">
-            <div class="field"><label for="remetente_nome">Nome</label><input id="remetente_nome" name="remetente_nome" type="text"></div>
-            <div class="field"><label for="remetente_cpf_cnpj">CPF/CNPJ</label><input id="remetente_cpf_cnpj" class="cpf-cnpj" name="remetente_cpf_cnpj" type="text"></div>
-            <div class="field"><label for="remetente_endereco">Endereço</label><input id="remetente_endereco" name="remetente_endereco" type="text"></div>
-            <div class="field"><label for="remetente_numero">Nº</label><input id="remetente_numero" name="remetente_numero" type="text"></div>
-            <div class="field"><label for="remetente_complemento">Complemento</label><input id="remetente_complemento" name="remetente_complemento" type="text"></div>
-            <div class="field"><label for="remetente_cidade">Cidade</label><input id="remetente_cidade" name="remetente_cidade" type="text"></div>
-            <div class="field"><label for="remetente_cep">CEP</label><input id="remetente_cep" class="cep" name="remetente_cep" type="text"></div>
-            <div class="field"><label for="remetente_telefone">Telefone</label><input id="remetente_telefone" name="remetente_telefone" type="text"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="step">
-      <div class="card">
-        <div class="card-header">5. Destinatário</div>
-        <div class="card-body">
-          <div class="grid">
-            <div class="field"><label for="destinatario_nome">Nome</label><input id="destinatario_nome" name="destinatario_nome" type="text"></div>
-            <div class="field"><label for="destinatario_cpf_cnpj">CPF/CNPJ</label><input id="destinatario_cpf_cnpj" class="cpf-cnpj" name="destinatario_cpf_cnpj" type="text"></div>
-            <div class="field"><label for="destinatario_endereco">Endereço</label><input id="destinatario_endereco" name="destinatario_endereco" type="text"></div>
-            <div class="field"><label for="destinatario_numero">Nº</label><input id="destinatario_numero" name="destinatario_numero" type="text"></div>
-            <div class="field"><label for="destinatario_complemento">Complemento</label><input id="destinatario_complemento" name="destinatario_complemento" type="text"></div>
-            <div class="field"><label for="destinatario_cidade">Cidade</label><input id="destinatario_cidade" name="destinatario_cidade" type="text"></div>
-            <div class="field"><label for="destinatario_cep">CEP</label><input id="destinatario_cep" class="cep" name="destinatario_cep" type="text"></div>
-            <div class="field"><label for="destinatario_telefone">Telefone</label><input id="destinatario_telefone" name="destinatario_telefone" type="text"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="step">
-      <div class="card">
-        <div class="card-header">6. Informações da carga</div>
-        <div class="card-body">
-          <div class="grid-3">
-            <div class="field"><label for="volumes">Volumes</label><input id="volumes" name="volumes" type="text"></div>
-            <div class="field"><label for="peso_kg">Peso (kg)</label><input id="peso_kg" name="peso_kg" type="text"></div>
-            <div class="field"><label for="dimensoes">Dimensões</label><input id="dimensoes" name="dimensoes" type="text"></div>
-          </div>
-          <div class="grid">
-            <div class="field"><label for="tipo_embalagem">Tipo de embalagem</label><input id="tipo_embalagem" name="tipo_embalagem" type="text"></div>
-            <div class="field"><label for="descricao_carga">Descrição</label><input id="descricao_carga" name="descricao_carga" type="text"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="step">
-      <div class="card">
-        <div class="card-header">7. Documentação</div>
-        <div class="card-body">
-          <div class="grid">
-            <div class="field">
-              <label>Documento</label>
-              <div class="radio-group">
-                <label class="radio-option"><input type="radio" name="tipo_documento" id="docNotaFiscal" value="Nota fiscal">Nota fiscal</label>
-                <label class="radio-option"><input type="radio" name="tipo_documento" id="docDeclaracao" value="DC-e">DC-e</label>
-              </div>
-            </div>
-            <div class="field">
-              <label id="labelValorDocumento" for="valor_documento">Nota fiscal - Valor (R$)</label>
-              <input id="valor_documento" class="money" name="valor_documento" type="text">
-            </div>
-          </div>
-
-          <div class="grid-1" id="blocoNumeroNota" style="display:none;">
-            <div class="field">
-              <label for="numero_nota_fiscal">Número da nota fiscal</label>
-              <input id="numero_nota_fiscal" name="numero_nota_fiscal" type="text" placeholder="Digite o número da nota fiscal">
-            </div>
-          </div>
-
-          <div class="grid-1" id="blocoDce" style="display:none;">
-            <div class="field">
-              <label for="numero_dce">Número do DC-e</label>
-              <input id="numero_dce" name="numero_dce" type="text" placeholder="Digite o número do DC-e">
-            </div>
-
-            <div class="app-links-box">
-              <div class="app-links-title">Baixe o aplicativo para emitir o DC-e</div>
-              <div class="app-links-grid">
-                <a id="appStoreLink" class="store-link" href="https://apps.apple.com/br/app/dce/id6753601602" target="_blank" rel="noopener noreferrer">
-                  <small>Disponível na</small>
-                  <strong>App Store</strong>
-                </a>
-                <a id="playStoreLink" class="store-link" href="https://play.google.com/store/apps/details?id=br.gov.pr.celepar.sefa.dce&hl=pt_BR" target="_blank" rel="noopener noreferrer">
-                  <small>Disponível no</small>
-                  <strong>Google Play</strong>
-                </a>
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="anexo_dce">Anexar DC-e</label>
-              <input id="anexo_dce" name="anexo_dce" type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-              <div class="file-note" id="anexoDceStatus">Nenhum arquivo anexado.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="step">
-      <div class="card">
-        <div class="card-header">8. Declaração</div>
-        <div class="card-body">
-          <div class="field">
-            <label for="declaracao_texto">Texto da declaração</label>
-            <textarea id="declaracao_texto" name="declaracao_texto">Autorizo a emissão do conhecimento aéreo e o transporte do(s) volume(s) conforme especificações acima neste documento, responsabilizando-me por eventuais atrasos ou prejuizos decorrentes de informações incorretas ou incompletas nesta minuta. Declaro que: O(s) volume(s) foi(foram) submetido(s) a controles de segurança apropriados até o momento da entrega à Azul Linhas Aereas Brasileiras S.A. Até o momento da entrega à Azul Linhas Aereas Brasileiras S.A., o(s) volume(s) foi(foram) manuseados por pessoas devidamente autorizadas e treinadas para identificar artigos proibidos e/ou perigosos para o transporte aéreo, e nenhum deles apresenta historico criminal junto às autoridades policiais. O(s) volume(s) foi(foram) devidamente conferido(s) e inspecionado(s) e está(ão) de acordo com a descrição contida no documento fiscal correspondente, cujas informações integrarão o Conhecimento Aéreo-AWB. O(s) volume(s) está(ão) acondicionado(s) em embalagem(ns) adequada(s) para garantir a sua preservação durante o transporte até sua entrega ao destinatario. Quaisquer irregularidades identificadas no(s) volume(s) serão imediatamente comunicadas à Azul Linhas Aereas Brasileiras S.A. Afirmo que o(s) volume(s) apresentado(s) NÃO CONTEM nenhum dos itens abaixo, pois estou ciente de que são PROIBIDOS PARA TRANSPORTE PELA AZUL. Artigo Perigoso à segurança do transporte aereo (conforme classificação da ONU). Documento de Licitação; Animal Vivo; Carga Valor (acima de R$ 5.000,00/kg) ou Vulneravel, sem autorização prévia da Azul Cargo para aceitação.</textarea>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="step">
-      <div class="card">
-        <div class="card-header">9. Responsável</div>
-        <div class="card-body">
-          <div class="grid">
-            <div class="field"><label for="responsavel_local">Local</label><input id="responsavel_local" name="responsavel_local" type="text"></div>
-            <div class="field"><label for="responsavel_data">Data</label><input id="responsavel_data" class="data" name="responsavel_data" type="text"></div>
-            <div class="field"><label for="responsavel_rg">RG</label><input id="responsavel_rg" class="rg" name="responsavel_rg" type="text"></div>
-            <div class="field"><label for="responsavel_nome">Nome</label><input id="responsavel_nome" name="responsavel_nome" type="text"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="step">
-      <div class="card">
-        <div class="card-header">10. Observações finais</div>
-        <div class="card-body">
-          <div class="field">
-            <label for="observacoes">Observações</label>
-            <textarea id="observacoes" name="observacoes"></textarea>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="step">
-      <div class="card">
-        <div class="card-header">11. Assinatura digital</div>
-        <div class="card-body">
-          <div class="field">
-            <label>Assinatura do responsável</label>
-            <div class="signature-wrap">
-              <div class="signature-toolbar">
-                <span class="muted">Assine com dedo, mouse ou caneta</span>
-                <button type="button" id="btnLimparAssinatura">Limpar assinatura</button>
-              </div>
-              <div class="signature-canvas-box">
-                <canvas id="assinatura"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="step">
-      <div class="card">
-        <div class="card-header">12. Revisão final</div>
-        <div class="card-body">
-          <div class="review-box" id="reviewBox"></div>
-          <div id="statusBox" class="status-box"></div>
-        </div>
-      </div>
-    </section>
-  </form>
-
-  <div class="wizard-nav">
-    <button type="button" id="btnVoltar" class="secondary">Voltar</button>
-    <button type="button" id="btnProximo">Próximo</button>
-    <button type="button" id="btnPdf">Baixar PDF</button>
-    <button type="button" id="btnEnviar" class="success">Enviar</button>
-  </div>
-</div>
-
-<script>
-let etapaAtual = 0;
-
-function showStep(index) {
-  const steps = document.querySelectorAll(".step");
-  const btnVoltar = document.getElementById("btnVoltar");
-  const btnProximo = document.getElementById("btnProximo");
-  const btnPdf = document.getElementById("btnPdf");
-  const btnEnviar = document.getElementById("btnEnviar");
-  const badge = document.getElementById("wizardStepLabel");
-
-  steps.forEach((step, i) => {
-    step.classList.toggle("active-step", i === index);
-  });
-
-  badge.textContent = Etapa ${index + 1} de ${steps.length};
-  btnVoltar.style.display = index === 0 ? "none" : "block";
-
-  const ultima = index === steps.length - 1;
-  btnProximo.style.display = ultima ? "none" : "block";
-  btnPdf.style.display = ultima ? "block" : "none";
-  btnEnviar.style.display = ultima ? "block" : "none";
-
-  if (ultima) montarRevisao();
-  limparStatus();
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-function nextStep() {
-  const total = document.querySelectorAll(".step").length;
-  if (etapaAtual < total - 1) {
-    etapaAtual += 1;
-    showStep(etapaAtual);
-  }
-}
-
-function prevStep() {
-  if (etapaAtual > 0) {
-    etapaAtual -= 1;
-    showStep(etapaAtual);
-  }
-}
-
-function detectarCelular() {
-  const ua = navigator.userAgent || "";
-  const ehMobileUA = /Android|iPhone|iPod|iPad|Opera Mini|IEMobile|Mobile/i.test(ua);
-  const ehTelaPequena = window.innerWidth <= 768;
-
-  document.body.classList.toggle("mobile-device", ehMobileUA || ehTelaPequena);
-
-  document.getElementById("tipo_dispositivo").value = (ehMobileUA || ehTelaPequena) ? "MOBILE" : "DESKTOP";
-  document.getElementById("largura_tela").value = window.innerWidth || "";
-  document.getElementById("altura_tela").value = window.innerHeight || "";
-  document.getElementById("user_agent").value = navigator.userAgent || "";
-}
-
-function onlyDigits(value) {
-  return String(value || "").replace(/\D/g, "");
-}
-
-function maskCNPJ(value) {
-  let v = onlyDigits(value).slice(0, 14);
-  v = v.replace(/^(\d{2})(\d)/, "$1.$2");
-  v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-  v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
-  v = v.replace(/(\d{4})(\d)/, "$1-$2");
-  return v;
-}
-
-function maskCPForCNPJ(value) {
-  let v = onlyDigits(value);
-  if (v.length <= 11) {
-    v = v.slice(0, 11);
-    v = v.replace(/(\d{3})(\d)/, "$1.$2");
-    v = v.replace(/(\d{3})(\d)/, "$1.$2");
-    v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-    return v;
-  }
-  return maskCNPJ(v);
-}
-
-function getRadioValue(name) {
-  const checked = document.querySelector(input[name="${name}"]:checked);
-  return checked ? checked.value : "";
-}
-
-function toggleAero(show) {
-  const bloco = document.getElementById("blocoAeroporto");
-  const campo = document.getElementById("local_retirada");
-  bloco.style.display = show ? "block" : "none";
-  if (!show) campo.value = "";
-}
-
-function toggleNumeroNotaFiscal() {
-  const docNota = document.getElementById("docNotaFiscal");
-  const docDce = document.getElementById("docDeclaracao");
-  const blocoNota = document.getElementById("blocoNumeroNota");
-  const blocoDce = document.getElementById("blocoDce");
-  const campoNota = document.getElementById("numero_nota_fiscal");
-  const campoDce = document.getElementById("numero_dce");
-  const labelValor = document.getElementById("labelValorDocumento");
-  const anexo = document.getElementById("anexo_dce");
-  const anexoNome = document.getElementById("anexo_dce_nome");
-  const anexoBase64 = document.getElementById("anexo_dce_base64");
-  const anexoStatus = document.getElementById("anexoDceStatus");
-
-  if (docNota.checked) {
-    blocoNota.style.display = "grid";
-    blocoDce.style.display = "none";
-    labelValor.textContent = "Nota fiscal - Valor (R$)";
-    campoDce.value = "";
-    anexo.value = "";
-    anexoNome.value = "";
-    anexoBase64.value = "";
-    anexoStatus.textContent = "Nenhum arquivo anexado.";
-  } else if (docDce.checked) {
-    blocoNota.style.display = "none";
-    blocoDce.style.display = "grid";
-    campoNota.value = "";
-    labelValor.textContent = "DC-e - Valor declarado (R$)";
-  } else {
-    blocoNota.style.display = "none";
-    blocoDce.style.display = "none";
-    campoNota.value = "";
-    campoDce.value = "";
-    anexo.value = "";
-    anexoNome.value = "";
-    anexoBase64.value = "";
-    anexoStatus.textContent = "Nenhum arquivo anexado.";
-    labelValor.textContent = "Documento - Valor (R$)";
-  }
-}
-
-function atualizarEstadoFrete() {
-  const selecionado = document.querySelector('input[name="frete"]:checked');
-  const campo = document.getElementById("cnpj_frete");
-  if (selecionado && selecionado.value === "Pago na origem") {
-    campo.value = "";
-    campo.disabled = true;
-    campo.style.backgroundColor = "#f0f0f0";
-  } else {
-    campo.disabled = false;
-    campo.style.backgroundColor = "#dbe5f1";
-  }
-}
-
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = String(reader.result || "");
-      resolve(result.split(",")[1] || "");
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-function coletarDados() {
-  const form = document.getElementById("minutaForm");
-  const formData = new FormData(form);
-  const data = {};
-
-  for (const [key, value] of formData.entries()) {
-    data[key] = value;
-  }
-
-  data.tipo_servico = getRadioValue("tipo_servico");
-  data.frete = getRadioValue("frete");
-  data.tomador = getRadioValue("tomador");
-  data.forma_entrega = getRadioValue("forma_entrega");
-  data.tipo_documento = getRadioValue("tipo_documento");
-  return data;
-}
-
-function montarRevisao() {
-  const d = coletarDados();
-  document.getElementById("reviewBox").textContent = [
-    Nº coleta: ${d.numero_coleta || ""},
-    Tipo de serviço: ${d.tipo_servico || ""},
-    Pagamento frete: ${d.frete || ""},
-    Tomador: ${d.tomador || ""},
-    CNPJ tomador: ${d.cnpj_frete || ""},
-    Forma de entrega: ${d.forma_entrega || ""},
-    Local retirada: ${d.local_retirada || ""},
-    ``,
-    REMETENTE,
-    Nome: ${d.remetente_nome || ""},
-    CPF/CNPJ: ${d.remetente_cpf_cnpj || ""},
-    Endereço: ${d.remetente_endereco || ""}, ${d.remetente_numero || ""},
-    Complemento: ${d.remetente_complemento || ""},
-    Cidade: ${d.remetente_cidade || ""},
-    CEP: ${d.remetente_cep || ""},
-    Telefone: ${d.remetente_telefone || ""},
-    ``,
-    DESTINATÁRIO,
-    Nome: ${d.destinatario_nome || ""},
-    CPF/CNPJ: ${d.destinatario_cpf_cnpj || ""},
-    Endereço: ${d.destinatario_endereco || ""}, ${d.destinatario_numero || ""},
-    Complemento: ${d.destinatario_complemento || ""},
-    Cidade: ${d.destinatario_cidade || ""},
-    CEP: ${d.destinatario_cep || ""},
-    Telefone: ${d.destinatario_telefone || ""},
-    ``,
-    CARGA,
-    Volumes: ${d.volumes || ""},
-    Peso (kg): ${d.peso_kg || ""},
-    Dimensões: ${d.dimensoes || ""},
-    Tipo embalagem: ${d.tipo_embalagem || ""},
-    Descrição: ${d.descricao_carga || ""},
-    ``,
-    DOCUMENTAÇÃO,
-    Tipo: ${d.tipo_documento || ""},
-    Valor: ${d.valor_documento || ""},
-    Número NF: ${d.numero_nota_fiscal || ""},
-    Número DC-e: ${d.numero_dce || ""},
-    Anexo DC-e: ${d.anexo_dce_nome || ""},
-    ``,
-    RESPONSÁVEL,
-    Local: ${d.responsavel_local || ""},
-    Data: ${d.responsavel_data || ""},
-    RG: ${d.responsavel_rg || ""},
-    Nome: ${d.responsavel_nome || ""},
-    ``,
-    Observações: ${d.observacoes || ""}
-  ].join("\n");
-}
-
-function mostrarStatus(tipo, texto) {
-  const box = document.getElementById("statusBox");
-  box.className = "status-box show " + (tipo === "success" ? "status-success" : "status-error");
-  box.textContent = texto;
-}
-
-function limparStatus() {
-  const box = document.getElementById("statusBox");
-  box.className = "status-box";
-  box.textContent = "";
-}
-
-function getLogoDataUrl() {
-  return new Promise((resolve) => {
-    const img = document.getElementById("logoAzul");
-    if (!img || !img.complete) {
-      resolve(null);
-      return;
-    }
-    try {
-      const canvas = document.createElement("canvas");
-      canvas.width = img.naturalWidth || img.width;
-      canvas.height = img.naturalHeight || img.height;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
-      resolve(canvas.toDataURL("image/png"));
-    } catch {
-      resolve(null);
-    }
-  });
-}
-
-function drawFilledRect(doc, x, y, w, h, color) {
-  doc.setFillColor(color[0], color[1], color[2]);
-  doc.rect(x, y, w, h, "F");
-}
-
-function drawBorder(doc, x, y, w, h, width = 0.2) {
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(width);
-  doc.rect(x, y, w, h);
-}
-
-function drawHeaderBar(doc, text, x, y, w, h) {
-  drawFilledRect(doc, x, y, w, h, [11, 45, 92]);
-  drawBorder(doc, x, y, w, h);
-  doc.setTextColor(255, 255, 255);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(8.5);
-  doc.text(text, x + 1.5, y + h - 1.8);
-  doc.setTextColor(0, 0, 0);
-}
-
-function drawFieldCell(doc, x, y, w, h, label, value, labelWidth = null) {
-  drawBorder(doc, x, y, w, h);
-  if (labelWidth === null) labelWidth = Math.min(38, w * 0.35);
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(7.5);
-  doc.text(label, x + 1.5, y + 4.2);
-
-  const fieldX = x + labelWidth;
-  const fieldW = w - labelWidth - 1.2;
-  if (fieldW > 2) {
-    doc.setFillColor(220, 230, 241);
-    doc.rect(fieldX, y + 1, fieldW, h - 2, "F");
-  }
-
-  const lines = doc.splitTextToSize(String(value || ""), Math.max(5, fieldW - 2));
-  doc.text(lines.slice(0, 2), fieldX + 1.2, y + 4.2);
-}
-
-function drawCheckboxLine(doc, x, y, w, text, checked, valueText = "") {
-  drawBorder(doc, x, y, w, 7);
-  doc.circle(x + 3, y + 3.5, 1.5);
-  if (checked) {
-    doc.setFillColor(11, 45, 92);
-    doc.circle(x + 3, y + 3.5, 0.8, "F");
-  }
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(7.5);
-  doc.text(text, x + 6, y + 4.2);
-  if (valueText) {
-    doc.setFillColor(220, 230, 241);
-    doc.rect(x + w - 75, y + 1, 73, 5, "F");
-    const lines = doc.splitTextToSize(String(valueText), 68);
-    doc.text(lines.slice(0, 1), x + w - 73, y + 4.2);
-  }
-}
-
-async function gerarPdfBase64() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF("p", "mm", "a4");
-  const d = coletarDados();
-  const assinaturaBase64 = document.getElementById("assinatura_base64").value || "";
-  const logoDataUrl = await getLogoDataUrl();
-
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.2);
-
-  const pageX = 10;
-  const pageW = 190;
-  let y = 10;
-
-  drawBorder(doc, pageX, y, 55, 14);
-  if (logoDataUrl) {
-    try {
-      doc.addImage(logoDataUrl, "PNG", pageX + 6, y + 2, 42, 10);
-    } catch {}
-  }
-
-  drawBorder(doc, pageX + 55, y, 58, 14);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(9);
-  doc.setTextColor(0, 0, 0);
-  doc.text("MINUTA DE DESPACHO DE CARGA", pageX + 58, y + 8);
-
-  drawBorder(doc, pageX + 113, y, 77, 14);
-  doc.setFontSize(8.5);
-  doc.text("Nº DA COLETA", pageX + 115, y + 4.5);
-  doc.setFillColor(220, 230, 241);
-  doc.rect(pageX + 114.5, y + 6, 73, 5.5, "F");
-  doc.text(String(d.numero_coleta || ""), pageX + 116, y + 10);
-  y += 14;
-
-  drawHeaderBar(doc, "1. TIPO DE SERVIÇO", pageX, y, pageW, 6);
-  y += 6;
-
-  const servCols = [47.5, 47.5, 47.5, 47.5];
-  const servTexts = ["Expresso", "Premium", "Ecommerce", "Standard"];
-  const servVals = ["Expresso", "Premium", "Ecommerce", "Standard"];
-  let sx = pageX;
-  for (let i = 0; i < servCols.length; i++) {
-    drawBorder(doc, sx, y, servCols[i], 7);
-    doc.circle(sx + 4, y + 3.5, 1.5);
-    if (d.tipo_servico === servVals[i]) {
-      doc.setFillColor(11, 45, 92);
-      doc.circle(sx + 4, y + 3.5, 0.8, "F");
-    }
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(7.5);
-    doc.text(servTexts[i], sx + 8, y + 4.2);
-    sx += servCols[i];
-  }
-  y += 7;
-
-  drawHeaderBar(doc, "2. PAGAMENTO DE FRETE / TOMADOR", pageX, y, pageW, 6);
-  y += 6;
-
-  drawBorder(doc, pageX, y, 112, 14);
-  drawBorder(doc, pageX + 112, y, 78, 14);
-  doc.setFontSize(7.5);
-  doc.text("Pagamento de Frete", pageX + 1.5, y + 4.2);
-
-  doc.circle(pageX + 41, y + 3.5, 1.5);
-  if (d.frete === "Pago na origem") {
-    doc.setFillColor(11, 45, 92);
-    doc.circle(pageX + 41, y + 3.5, 0.8, "F");
-  }
-  doc.text("Pago na origem", pageX + 45, y + 4.2);
-
-  doc.circle(pageX + 41, y + 9.8, 1.5);
-  if (d.frete === "Cliente correntista") {
-    doc.setFillColor(11, 45, 92);
-    doc.circle(pageX + 41, y + 9.8, 0.8, "F");
-  }
-  doc.text("Cliente correntista", pageX + 45, y + 10.5);
-
-  doc.text("Tomador", pageX + 114, y + 4.2);
-  doc.circle(pageX + 134, y + 3.5, 1.5);
-  if (d.tomador === "Remetente") {
-    doc.setFillColor(11, 45, 92);
-    doc.circle(pageX + 134, y + 3.5, 0.8, "F");
-  }
-  doc.text("Remetente", pageX + 138, y + 4.2);
-
-  doc.circle(pageX + 134, y + 9.8, 1.5);
-  if (d.tomador === "Destinatário") {
-    doc.setFillColor(11, 45, 92);
-    doc.circle(pageX + 134, y + 9.8, 0.8, "F");
-  }
-  doc.text("Destinatário", pageX + 138, y + 10.5);
-  y += 14;
-
-  drawFieldCell(doc, pageX, y, pageW, 7, "CNPJ do Tomador", d.cnpj_frete || "", 38);
-  y += 7;
-
-  drawHeaderBar(doc, "3. FORMA DE ENTREGA", pageX, y, pageW, 6);
-  y += 6;
-
-  drawBorder(doc, pageX, y, pageW, 7);
-  doc.circle(pageX + 31, y + 3.5, 1.5);
-  if (d.forma_entrega === "Entrega no endereço") {
-    doc.setFillColor(11, 45, 92);
-    doc.circle(pageX + 31, y + 3.5, 0.8, "F");
-  }
-  doc.text("Entrega no endereço", pageX + 35, y + 4.2);
-
-  doc.circle(pageX + 78, y + 3.5, 1.5);
-  if (d.forma_entrega === "Retirada na unidade") {
-    doc.setFillColor(11, 45, 92);
-    doc.circle(pageX + 78, y + 3.5, 0.8, "F");
-  }
-  doc.text("Retirada na unidade", pageX + 82, y + 4.2);
-
-  if (d.local_retirada) {
-    doc.text(Local: ${d.local_retirada}, pageX + 132, y + 4.2);
-  }
-  y += 7;
-
-  drawHeaderBar(doc, "REMETENTE", pageX, y, 95, 6);
-  drawHeaderBar(doc, "DESTINATÁRIO", pageX + 95, y, 95, 6);
-  y += 6;
-
-  const rowH = 7;
-  const leftX = pageX;
-  const rightX = pageX + 95;
-
-  drawFieldCell(doc, leftX, y, 95, rowH, "Nome", d.remetente_nome || "", 38);
-  drawFieldCell(doc, rightX, y, 95, rowH, "Nome", d.destinatario_nome || "", 22);
-  y += rowH;
-  drawFieldCell(doc, leftX, y, 95, rowH, "CPF/CNPJ", d.remetente_cpf_cnpj || "", 38);
-  drawFieldCell(doc, rightX, y, 95, rowH, "CPF/CNPJ", d.destinatario_cpf_cnpj || "", 22);
-  y += rowH;
-  drawFieldCell(doc, leftX, y, 95, rowH, "Endereço", d.remetente_endereco || "", 38);
-  drawFieldCell(doc, rightX, y, 95, rowH, "Endereço", d.destinatario_endereco || "", 22);
-  y += rowH;
-  drawFieldCell(doc, leftX, y, 95, rowH, "Nº", d.remetente_numero || "", 38);
-  drawFieldCell(doc, rightX, y, 95, rowH, "Nº", d.destinatario_numero || "", 22);
-  y += rowH;
-  drawFieldCell(doc, leftX, y, 95, rowH, "Compl.", d.remetente_complemento || "", 38);
-  drawFieldCell(doc, rightX, y, 95, rowH, "Compl.", d.destinatario_complemento || "", 22);
-  y += rowH;
-  drawFieldCell(doc, leftX, y, 95, rowH, "Cidade", d.remetente_cidade || "", 38);
-  drawFieldCell(doc, rightX, y, 95, rowH, "Cidade", d.destinatario_cidade || "", 22);
-  y += rowH;
-  drawFieldCell(doc, leftX, y, 95, rowH, "CEP", d.remetente_cep || "", 38);
-  drawFieldCell(doc, rightX, y, 95, rowH, "CEP", d.destinatario_cep || "", 22);
-  y += rowH;
-  drawFieldCell(doc, leftX, y, 95, rowH, "Telefone", d.remetente_telefone || "", 38);
-  drawFieldCell(doc, rightX, y, 95, rowH, "Telefone", d.destinatario_telefone || "", 22);
-  y += rowH;
-
-  drawHeaderBar(doc, "INFORMAÇÕES DA CARGA", pageX, y, pageW, 6);
-  y += 6;
-  drawFieldCell(doc, pageX, y, 70, 8, "Volumes", d.volumes || "", 20);
-  drawFieldCell(doc, pageX + 70, y, 60, 8, "Peso\n(kg)", d.peso_kg || "", 16);
-  drawFieldCell(doc, pageX + 130, y, 60, 8, "Dimensões", d.dimensoes || "", 18);
-  y += 8;
-  drawFieldCell(doc, pageX, y, 84, 8, "Tipo de\nembalagem", d.tipo_embalagem || "", 22);
-  drawFieldCell(doc, pageX + 84, y, 106, 8, "Descrição", d.descricao_carga || "", 18);
-  y += 8;
-
-  drawHeaderBar(doc, "DOCUMENTAÇÃO", pageX, y, pageW, 6);
-  y += 6;
-  drawCheckboxLine(doc, pageX, y, pageW, "Nota fiscal - Valor (R$)", d.tipo_documento === "Nota fiscal", d.tipo_documento === "Nota fiscal" ? d.valor_documento : "");
-  y += 7;
-  drawCheckboxLine(doc, pageX, y, pageW, "DC-e - Valor declarado (R$)", d.tipo_documento === "DC-e", d.tipo_documento === "DC-e" ? d.valor_documento : "");
-  y += 7;
-
-  if (d.numero_nota_fiscal) {
-    drawFieldCell(doc, pageX, y, pageW, 7, "Número da nota fiscal", d.numero_nota_fiscal || "", 42);
-    y += 7;
-  }
-  if (d.numero_dce) {
-    drawFieldCell(doc, pageX, y, pageW, 7, "Número do DC-e", d.numero_dce || "", 35);
-    y += 7;
-  }
-  if (d.anexo_dce_nome) {
-    drawFieldCell(doc, pageX, y, pageW, 7, "Anexo DC-e", d.anexo_dce_nome || "", 28);
-    y += 7;
-  }
-
-  drawHeaderBar(doc, "DECLARAÇÃO", pageX, y, pageW, 6);
-  y += 6;
-  const declaracaoH = 42;
-  drawBorder(doc, pageX, y, pageW, declaracaoH);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(5.8);
-  const declaracaoTexto = doc.splitTextToSize(String(d.declaracao_texto || ""), 186);
-  doc.text(declaracaoTexto.slice(0, 18), pageX + 1.5, y + 3.8);
-  y += declaracaoH;
-
-  drawHeaderBar(doc, "RESPONSÁVEL", pageX, y, pageW, 6);
-  y += 6;
-  drawFieldCell(doc, pageX, y, 55, 8, "Local", d.responsavel_local || "", 14);
-  drawFieldCell(doc, pageX + 55, y, 45, 8, "Data", d.responsavel_data || "", 14);
-  drawFieldCell(doc, pageX + 100, y, 90, 8, "Nome", d.responsavel_nome || "", 14);
-  y += 8;
-  drawFieldCell(doc, pageX, y, 55, 8, "RG", d.responsavel_rg || "", 14);
-
-  drawBorder(doc, pageX + 55, y, 135, 24);
-  doc.setFontSize(7);
-  doc.text("Assinatura", pageX + 57, y + 4);
-  if (assinaturaBase64) {
-    try { doc.addImage(assinaturaBase64, "PNG", pageX + 58, y + 5, 60, 16); } catch {}
-  }
-
-  const arrayBuffer = doc.output("arraybuffer");
-  const bytes = new Uint8Array(arrayBuffer);
-  let binary = "";
-  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-  const base64 = btoa(binary);
-  document.getElementById("pdf_base64").value = base64;
-  return { doc, base64 };
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  detectarCelular();
-
-  document.getElementById("btnVoltar").addEventListener("click", prevStep);
-  document.getElementById("btnProximo").addEventListener("click", nextStep);
-
-  document.querySelectorAll('input[name="tipo_documento"]').forEach(r => {
-    r.addEventListener("change", toggleNumeroNotaFiscal);
-  });
-  document.querySelectorAll('input[name="frete"]').forEach(r => {
-    r.addEventListener("change", atualizarEstadoFrete);
-  });
-
-  document.getElementById("cnpj_frete").addEventListener("input", (e) => {
-    e.target.value = maskCNPJ(e.target.value);
-  });
-
-  document.querySelectorAll(".cpf-cnpj").forEach(el => {
-    el.addEventListener("input", (e) => {
-      e.target.value = maskCPForCNPJ(e.target.value);
-    });
-  });
-
-  document.querySelectorAll(".cep").forEach(el => {
-    el.addEventListener("input", () => {
-      let v = onlyDigits(el.value).slice(0, 8);
-      v = v.replace(/(\d{5})(\d)/, "$1-$2");
-      el.value = v;
-    });
-  });
-
-  document.querySelectorAll(".rg").forEach(el => {
-    el.addEventListener("input", () => {
-      let v = onlyDigits(el.value).slice(0, 9);
-      v = v.replace(/(\d{2})(\d)/, "$1.$2");
-      v = v.replace(/(\d{3})(\d)/, "$1.$2");
-      v = v.replace(/(\d{3})(\d)/, "$1-$2");
-      el.value = v;
-    });
-  });
-
-  document.querySelectorAll(".data").forEach(el => {
-    el.addEventListener("input", () => {
-      let v = onlyDigits(el.value).slice(0, 8);
-      v = v.replace(/(\d{2})(\d)/, "$1/$2");
-      v = v.replace(/(\d{2})(\d)/, "$1/$2");
-      el.value = v;
-    });
-  });
-
-  document.querySelectorAll(".money").forEach(el => {
-    el.addEventListener("input", () => {
-      let v = onlyDigits(el.value);
-      if (!v) {
-        el.value = "";
-        return;
-      }
-      v = (v / 100).toFixed(2);
-      v = v.replace(".", ",");
-      v = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-      el.value = "R$ " + v;
-    });
-  });
-
-  const anexoDceInput = document.getElementById("anexo_dce");
-  anexoDceInput.addEventListener("change", async (event) => {
-    const file = event.target.files && event.target.files[0];
-    const nome = document.getElementById("anexo_dce_nome");
-    const base = document.getElementById("anexo_dce_base64");
-    const status = document.getElementById("anexoDceStatus");
-
-    if (!file) {
-      nome.value = "";
-      base.value = "";
-      status.textContent = "Nenhum arquivo anexado.";
-      return;
+  <script>
+    let etapaAtual = 0;
+
+    function initMinuta() {
+      detectarCelular();
+      toggleNumeroNotaFiscal();
+      atualizarEstadoFrete();
+      configurarMascaras();
+      configurarAnexoDce();
+      configurarAssinatura();
+      showStep(etapaAtual);
     }
 
-    try {
-      base.value = await fileToBase64(file);
-      nome.value = file.name;
-      status.textContent = Arquivo anexado: ${file.name};
-    } catch {
-      nome.value = "";
-      base.value = "";
-      status.textContent = "Falha ao processar o arquivo.";
-    }
-  });
+    function showStep(index) {
+      const steps = document.querySelectorAll(".step");
+      const btnVoltar = document.getElementById("btnVoltar");
+      const btnProximo = document.getElementById("btnProximo");
+      const btnPdf = document.getElementById("btnPdf");
+      const btnEnviar = document.getElementById("btnEnviar");
+      const badge = document.getElementById("wizardStepLabel");
 
-  const canvas = document.getElementById("assinatura");
-  const ctx = canvas.getContext("2d");
-  const assinaturaInput = document.getElementById("assinatura_base64");
-  let assinando = false;
-
-  function ajustarCanvas() {
-    const ratio = Math.max(window.devicePixelRatio || 1, 1);
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * ratio;
-    canvas.height = rect.height * ratio;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(ratio, ratio);
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "#000";
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(0, 0, rect.width, rect.height);
-  }
-
-  function pos(evt) {
-    const rect = canvas.getBoundingClientRect();
-    if (evt.touches && evt.touches[0]) {
-      return {
-        x: evt.touches[0].clientX - rect.left,
-        y: evt.touches[0].clientY - rect.top
-      };
-    }
-    return {
-      x: evt.clientX - rect.left,
-      y: evt.clientY - rect.top
-    };
-  }
-
-  function startDraw(evt) {
-    evt.preventDefault();
-    assinando = true;
-    const p = pos(evt);
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y);
-  }
-
-  function moveDraw(evt) {
-    if (!assinando) return;
-    evt.preventDefault();
-    const p = pos(evt);
-    ctx.lineTo(p.x, p.y);
-    ctx.stroke();
-  }
-
-  function endDraw(evt) {
-    if (!assinando) return;
-    evt.preventDefault();
-    assinando = false;
-    ctx.beginPath();
-    assinaturaInput.value = canvas.toDataURL("image/png");
-  }
-
-  document.getElementById("btnLimparAssinatura").addEventListener("click", () => {
-    ajustarCanvas();
-    assinaturaInput.value = "";
-  });
-
-  canvas.addEventListener("mousedown", startDraw);
-  canvas.addEventListener("mousemove", moveDraw);
-  canvas.addEventListener("mouseup", endDraw);
-  canvas.addEventListener("mouseleave", endDraw);
-  canvas.addEventListener("touchstart", startDraw, { passive: false });
-  canvas.addEventListener("touchmove", moveDraw, { passive: false });
-  canvas.addEventListener("touchend", endDraw, { passive: false });
-
-  window.addEventListener("resize", ajustarCanvas);
-  ajustarCanvas();
-
-  document.getElementById("btnPdf").addEventListener("click", async () => {
-    try {
-      const { doc } = await gerarPdfBase64();
-      const numero = document.getElementById("numero_coleta").value || "minuta";
-      doc.save(minuta-${numero}.pdf);
-    } catch {
-      mostrarStatus("error", "Falha ao gerar PDF.");
-    }
-  });
-
-  document.getElementById("btnEnviar").addEventListener("click", async () => {
-    try {
-      const { base64 } = await gerarPdfBase64();
-      const payload = coletarDados();
-      payload.pdf_base64 = base64;
-      payload.assinatura_base64 = document.getElementById("assinatura_base64").value || "";
-      payload.anexo_dce_nome = document.getElementById("anexo_dce_nome").value || "";
-      payload.anexo_dce_base64 = document.getElementById("anexo_dce_base64").value || "";
-
-      const response = await fetch("/api/minutas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+      steps.forEach((step, i) => {
+        step.classList.toggle("active-step", i === index);
       });
 
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Falha ao enviar.");
-      mostrarStatus("success", Minuta enviada com sucesso. ID: ${result.id});
-    } catch (e) {
-      mostrarStatus("error", e.message || "Erro no envio.");
+      badge.textContent = "Etapa " + (index + 1) + " de " + steps.length;
+      btnVoltar.style.display = index === 0 ? "none" : "block";
+
+      const ultima = index === steps.length - 1;
+      btnProximo.style.display = ultima ? "none" : "block";
+      btnPdf.style.display = ultima ? "block" : "none";
+      btnEnviar.style.display = ultima ? "block" : "none";
+
+      if (ultima) montarRevisao();
+      limparStatus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  });
 
-  toggleNumeroNotaFiscal();
-  atualizarEstadoFrete();
-  showStep(etapaAtual);
-});
+    function nextStep() {
+      const total = document.querySelectorAll(".step").length;
+      if (etapaAtual < total - 1) {
+        etapaAtual += 1;
+        showStep(etapaAtual);
+      }
+    }
 
-window.addEventListener("load", detectarCelular);
-window.addEventListener("resize", detectarCelular);
-</script>
+    function prevStep() {
+      if (etapaAtual > 0) {
+        etapaAtual -= 1;
+        showStep(etapaAtual);
+      }
+    }
+
+    function detectarCelular() {
+      const ua = navigator.userAgent || "";
+      const ehMobileUA = /Android|iPhone|iPod|iPad|Opera Mini|IEMobile|Mobile/i.test(ua);
+      const ehTelaPequena = window.innerWidth <= 768;
+
+      document.body.classList.toggle("mobile-device", ehMobileUA || ehTelaPequena);
+      document.getElementById("tipo_dispositivo").value = (ehMobileUA || ehTelaPequena) ? "MOBILE" : "DESKTOP";
+      document.getElementById("largura_tela").value = window.innerWidth || "";
+      document.getElementById("altura_tela").value = window.innerHeight || "";
+      document.getElementById("user_agent").value = navigator.userAgent || "";
+    }
+
+    function onlyDigits(value) {
+      return String(value || "").replace(/\D/g, "");
+    }
+
+    function maskCNPJ(value) {
+      let v = onlyDigits(value).slice(0, 14);
+      v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+      v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+      v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+      v = v.replace(/(\d{4})(\d)/, "$1-$2");
+      return v;
+    }
+
+    function maskCPForCNPJ(value) {
+      let v = onlyDigits(value);
+      if (v.length <= 11) {
+        v = v.slice(0, 11);
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        return v;
+      }
+      return maskCNPJ(v);
+    }
+
+    function getRadioValue(name) {
+      const checked = document.querySelector('input[name="' + name + '"]:checked');
+      return checked ? checked.value : "";
+    }
+
+    function toggleAero(show) {
+      const bloco = document.getElementById("blocoAeroporto");
+      const campo = document.getElementById("local_retirada");
+      bloco.style.display = show ? "block" : "none";
+      if (!show) campo.value = "";
+    }
+
+    function toggleNumeroNotaFiscal() {
+      const docNota = document.getElementById("docNotaFiscal");
+      const docDce = document.getElementById("docDeclaracao");
+      const blocoNota = document.getElementById("blocoNumeroNota");
+      const blocoDce = document.getElementById("blocoDce");
+      const campoNota = document.getElementById("numero_nota_fiscal");
+      const campoDce = document.getElementById("numero_dce");
+      const labelValor = document.getElementById("labelValorDocumento");
+      const anexo = document.getElementById("anexo_dce");
+      const anexoNome = document.getElementById("anexo_dce_nome");
+      const anexoBase64 = document.getElementById("anexo_dce_base64");
+      const anexoStatus = document.getElementById("anexoDceStatus");
+
+      if (docNota.checked) {
+        blocoNota.style.display = "grid";
+        blocoDce.style.display = "none";
+        labelValor.textContent = "Nota fiscal - Valor (R$)";
+        campoDce.value = "";
+        anexo.value = "";
+        anexoNome.value = "";
+        anexoBase64.value = "";
+        anexoStatus.textContent = "Nenhum arquivo anexado.";
+      } else if (docDce.checked) {
+        blocoNota.style.display = "none";
+        blocoDce.style.display = "grid";
+        campoNota.value = "";
+        labelValor.textContent = "DC-e - Valor declarado (R$)";
+      } else {
+        blocoNota.style.display = "none";
+        blocoDce.style.display = "none";
+        campoNota.value = "";
+        campoDce.value = "";
+        anexo.value = "";
+        anexoNome.value = "";
+        anexoBase64.value = "";
+        anexoStatus.textContent = "Nenhum arquivo anexado.";
+        labelValor.textContent = "Documento - Valor (R$)";
+      }
+    }
+
+    function atualizarEstadoFrete() {
+      const selecionado = document.querySelector('input[name="frete"]:checked');
+      const campo = document.getElementById("cnpj_frete");
+      if (selecionado && selecionado.value === "Pago na origem") {
+        campo.value = "";
+        campo.disabled = true;
+        campo.style.backgroundColor = "#f0f0f0";
+      } else {
+        campo.disabled = false;
+        campo.style.backgroundColor = "#dbe5f1";
+      }
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = String(reader.result || "");
+          resolve(result.split(",")[1] || "");
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function coletarDados() {
+      const form = document.getElementById("minutaForm");
+      const formData = new FormData(form);
+      const data = {};
+
+      for (const [key, value] of formData.entries()) {
+        data[key] = value;
+      }
+
+      data.tipo_servico = getRadioValue("tipo_servico");
+      data.frete = getRadioValue("frete");
+      data.tomador = getRadioValue("tomador");
+      data.forma_entrega = getRadioValue("forma_entrega");
+      data.tipo_documento = getRadioValue("tipo_documento");
+      return data;
+    }
+
+    function montarRevisao() {
+      const d = coletarDados();
+      document.getElementById("reviewBox").textContent = [
+        "Nº coleta: " + (d.numero_coleta || ""),
+        "Tipo de serviço: " + (d.tipo_servico || ""),
+        "Pagamento frete: " + (d.frete || ""),
+        "Tomador: " + (d.tomador || ""),
+        "CNPJ tomador: " + (d.cnpj_frete || ""),
+        "Forma de entrega: " + (d.forma_entrega || ""),
+        "Local retirada: " + (d.local_retirada || ""),
+        "",
+        "REMETENTE",
+        "Nome: " + (d.remetente_nome || ""),
+        "CPF/CNPJ: " + (d.remetente_cpf_cnpj || ""),
+        "Endereço: " + (d.remetente_endereco || "") + ", " + (d.remetente_numero || ""),
+        "Complemento: " + (d.remetente_complemento || ""),
+        "Cidade: " + (d.remetente_cidade || ""),
+        "CEP: " + (d.remetente_cep || ""),
+        "Telefone: " + (d.remetente_telefone || ""),
+        "",
+        "DESTINATÁRIO",
+        "Nome: " + (d.destinatario_nome || ""),
+        "CPF/CNPJ: " + (d.destinatario_cpf_cnpj || ""),
+        "Endereço: " + (d.destinatario_endereco || "") + ", " + (d.destinatario_numero || ""),
+        "Complemento: " + (d.destinatario_complemento || ""),
+        "Cidade: " + (d.destinatario_cidade || ""),
+        "CEP: " + (d.destinatario_cep || ""),
+        "Telefone: " + (d.destinatario_telefone || ""),
+        "",
+        "CARGA",
+        "Volumes: " + (d.volumes || ""),
+        "Peso (kg): " + (d.peso_kg || ""),
+        "Dimensões: " + (d.dimensoes || ""),
+        "Tipo embalagem: " + (d.tipo_embalagem || ""),
+        "Descrição: " + (d.descricao_carga || ""),
+        "",
+        "DOCUMENTAÇÃO",
+        "Tipo: " + (d.tipo_documento || ""),
+        "Valor: " + (d.valor_documento || ""),
+        "Número NF: " + (d.numero_nota_fiscal || ""),
+        "Número DC-e: " + (d.numero_dce || ""),
+        "Anexo DC-e: " + (d.anexo_dce_nome || ""),
+        "",
+        "RESPONSÁVEL",
+        "Local: " + (d.responsavel_local || ""),
+        "Data: " + (d.responsavel_data || ""),
+        "RG: " + (d.responsavel_rg || ""),
+        "Nome: " + (d.responsavel_nome || ""),
+        "",
+        "Observações: " + (d.observacoes || "")
+      ].join("\n");
+    }
+
+    function mostrarStatus(tipo, texto) {
+      const box = document.getElementById("statusBox");
+      box.className = "status-box show " + (tipo === "success" ? "status-success" : "status-error");
+      box.textContent = texto;
+    }
+
+    function limparStatus() {
+      const box = document.getElementById("statusBox");
+      box.className = "status-box";
+      box.textContent = "";
+    }
+
+    function getLogoDataUrl() {
+      return new Promise((resolve) => {
+        const img = document.getElementById("logoAzul");
+        if (!img || !img.complete) {
+          resolve(null);
+          return;
+        }
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.naturalWidth || img.width;
+          canvas.height = img.naturalHeight || img.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL("image/png"));
+        } catch {
+          resolve(null);
+        }
+      });
+    }
+
+    function drawFilledRect(doc, x, y, w, h, color) {
+      doc.setFillColor(color[0], color[1], color[2]);
+      doc.rect(x, y, w, h, "F");
+    }
+
+    function drawBorder(doc, x, y, w, h, width = 0.2) {
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(width);
+      doc.rect(x, y, w, h);
+    }
+
+    function drawHeaderBar(doc, text, x, y, w, h) {
+      drawFilledRect(doc, x, y, w, h, [11, 45, 92]);
+      drawBorder(doc, x, y, w, h);
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8.5);
+      doc.text(text, x + 1.5, y + h - 1.8);
+      doc.setTextColor(0, 0, 0);
+    }
+
+    function drawFieldCell(doc, x, y, w, h, label, value, labelWidth = null) {
+      drawBorder(doc, x, y, w, h);
+      if (labelWidth === null) labelWidth = Math.min(38, w * 0.35);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.text(label, x + 1.5, y + 4.2);
+
+      const fieldX = x + labelWidth;
+      const fieldW = w - labelWidth - 1.2;
+      if (fieldW > 2) {
+        doc.setFillColor(220, 230, 241);
+        doc.rect(fieldX, y + 1, fieldW, h - 2, "F");
+      }
+
+      const lines = doc.splitTextToSize(String(value || ""), Math.max(5, fieldW - 2));
+      doc.text(lines.slice(0, 2), fieldX + 1.2, y + 4.2);
+    }
+
+    function drawCheckboxLine(doc, x, y, w, text, checked, valueText = "") {
+      drawBorder(doc, x, y, w, 7);
+      doc.circle(x + 3, y + 3.5, 1.5);
+      if (checked) {
+        doc.setFillColor(11, 45, 92);
+        doc.circle(x + 3, y + 3.5, 0.8, "F");
+      }
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.text(text, x + 6, y + 4.2);
+      if (valueText) {
+        doc.setFillColor(220, 230, 241);
+        doc.rect(x + w - 75, y + 1, 73, 5, "F");
+        const lines = doc.splitTextToSize(String(valueText), 68);
+        doc.text(lines.slice(0, 1), x + w - 73, y + 4.2);
+      }
+    }
+
+    async function gerarPdfBase64() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF("p", "mm", "a4");
+      const d = coletarDados();
+      const assinaturaBase64 = document.getElementById("assinatura_base64").value || "";
+      const logoDataUrl = await getLogoDataUrl();
+
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.2);
+
+      const pageX = 10;
+      const pageW = 190;
+      let y = 10;
+
+      drawBorder(doc, pageX, y, 55, 14);
+      if (logoDataUrl) {
+        try { doc.addImage(logoDataUrl, "PNG", pageX + 6, y + 2, 42, 10); } catch {}
+      }
+
+      drawBorder(doc, pageX + 55, y, 58, 14);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      doc.text("MINUTA DE DESPACHO DE CARGA", pageX + 58, y + 8);
+
+      drawBorder(doc, pageX + 113, y, 77, 14);
+      doc.setFontSize(8.5);
+      doc.text("Nº DA COLETA", pageX + 115, y + 4.5);
+      doc.setFillColor(220, 230, 241);
+      doc.rect(pageX + 114.5, y + 6, 73, 5.5, "F");
+      doc.text(String(d.numero_coleta || ""), pageX + 116, y + 10);
+      y += 14;
+
+      drawHeaderBar(doc, "1. TIPO DE SERVIÇO", pageX, y, pageW, 6);
+      y += 6;
+
+      const servCols = [47.5, 47.5, 47.5, 47.5];
+      const servTexts = ["Expresso", "Premium", "Ecommerce", "Standard"];
+      const servVals = ["Expresso", "Premium", "Ecommerce", "Standard"];
+      let sx = pageX;
+      for (let i = 0; i < servCols.length; i++) {
+        drawBorder(doc, sx, y, servCols[i], 7);
+        doc.circle(sx + 4, y + 3.5, 1.5);
+        if (d.tipo_servico === servVals[i]) {
+          doc.setFillColor(11, 45, 92);
+          doc.circle(sx + 4, y + 3.5, 0.8, "F");
+        }
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7.5);
+        doc.text(servTexts[i], sx + 8, y + 4.2);
+        sx += servCols[i];
+      }
+      y += 7;
+
+      drawHeaderBar(doc, "2. PAGAMENTO DE FRETE / TOMADOR", pageX, y, pageW, 6);
+      y += 6;
+
+      drawBorder(doc, pageX, y, 112, 14);
+      drawBorder(doc, pageX + 112, y, 78, 14);
+      doc.setFontSize(7.5);
+      doc.text("Pagamento de Frete", pageX + 1.5, y + 4.2);
+
+      doc.circle(pageX + 41, y + 3.5, 1.5);
+      if (d.frete === "Pago na origem") {
+        doc.setFillColor(11, 45, 92);
+        doc.circle(pageX + 41, y + 3.5, 0.8, "F");
+      }
+      doc.text("Pago na origem", pageX + 45, y + 4.2);
+
+      doc.circle(pageX + 41, y + 9.8, 1.5);
+      if (d.frete === "Cliente correntista") {
+        doc.setFillColor(11, 45, 92);
+        doc.circle(pageX + 41, y + 9.8, 0.8, "F");
+      }
+      doc.text("Cliente correntista", pageX + 45, y + 10.5);
+
+      doc.text("Tomador", pageX + 114, y + 4.2);
+      doc.circle(pageX + 134, y + 3.5, 1.5);
+      if (d.tomador === "Remetente") {
+        doc.setFillColor(11, 45, 92);
+        doc.circle(pageX + 134, y + 3.5, 0.8, "F");
+      }
+      doc.text("Remetente", pageX + 138, y + 4.2);
+
+      doc.circle(pageX + 134, y + 9.8, 1.5);
+      if (d.tomador === "Destinatário") {
+        doc.setFillColor(11, 45, 92);
+        doc.circle(pageX + 134, y + 9.8, 0.8, "F");
+      }
+      doc.text("Destinatário", pageX + 138, y + 10.5);
+      y += 14;
+
+      drawFieldCell(doc, pageX, y, pageW, 7, "CNPJ do Tomador", d.cnpj_frete || "", 38);
+      y += 7;
+
+      drawHeaderBar(doc, "3. FORMA DE ENTREGA", pageX, y, pageW, 6);
+      y += 6;
+
+      drawBorder(doc, pageX, y, pageW, 7);
+      doc.circle(pageX + 31, y + 3.5, 1.5);
+      if (d.forma_entrega === "Entrega no endereço") {
+        doc.setFillColor(11, 45, 92);
+        doc.circle(pageX + 31, y + 3.5, 0.8, "F");
+      }
+      doc.text("Entrega no endereço", pageX + 35, y + 4.2);
+
+      doc.circle(pageX + 78, y + 3.5, 1.5);
+      if (d.forma_entrega === "Retirada na unidade") {
+        doc.setFillColor(11, 45, 92);
+        doc.circle(pageX + 78, y + 3.5, 0.8, "F");
+      }
+      doc.text("Retirada na unidade", pageX + 82, y + 4.2);
+
+      if (d.local_retirada) {
+        doc.text("Local: " + d.local_retirada, pageX + 132, y + 4.2);
+      }
+      y += 7;
+
+      drawHeaderBar(doc, "REMETENTE", pageX, y, 95, 6);
+      drawHeaderBar(doc, "DESTINATÁRIO", pageX + 95, y, 95, 6);
+      y += 6;
+
+      const rowH = 7;
+      const leftX = pageX;
+      const rightX = pageX + 95;
+
+      drawFieldCell(doc, leftX, y, 95, rowH, "Nome", d.remetente_nome || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "Nome", d.destinatario_nome || "", 22);
+      y += rowH;
+      drawFieldCell(doc, leftX, y, 95, rowH, "CPF/CNPJ", d.remetente_cpf_cnpj || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "CPF/CNPJ", d.destinatario_cpf_cnpj || "", 22);
+      y += rowH;
+      drawFieldCell(doc, leftX, y, 95, rowH, "Endereço", d.remetente_endereco || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "Endereço", d.destinatario_endereco || "", 22);
+      y += rowH;
+      drawFieldCell(doc, leftX, y, 95, rowH, "Nº", d.remetente_numero || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "Nº", d.destinatario_numero || "", 22);
+      y += rowH;
+      drawFieldCell(doc, leftX, y, 95, rowH, "Compl.", d.remetente_complemento || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "Compl.", d.destinatario_complemento || "", 22);
+      y += rowH;
+      drawFieldCell(doc, leftX, y, 95, rowH, "Cidade", d.remetente_cidade || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "Cidade", d.destinatario_cidade || "", 22);
+      y += rowH;
+      drawFieldCell(doc, leftX, y, 95, rowH, "CEP", d.remetente_cep || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "CEP", d.destinatario_cep || "", 22);
+      y += rowH;
+      drawFieldCell(doc, leftX, y, 95, rowH, "Telefone", d.remetente_telefone || "", 38);
+      drawFieldCell(doc, rightX, y, 95, rowH, "Telefone", d.destinatario_telefone || "", 22);
+      y += rowH;
+
+      drawHeaderBar(doc, "INFORMAÇÕES DA CARGA", pageX, y, pageW, 6);
+      y += 6;
+      drawFieldCell(doc, pageX, y, 70, 8, "Volumes", d.volumes || "", 20);
+      drawFieldCell(doc, pageX + 70, y, 60, 8, "Peso\n(kg)", d.peso_kg || "", 16);
+      drawFieldCell(doc, pageX + 130, y, 60, 8, "Dimensões", d.dimensoes || "", 18);
+      y += 8;
+      drawFieldCell(doc, pageX, y, 84, 8, "Tipo de\nembalagem", d.tipo_embalagem || "", 22);
+      drawFieldCell(doc, pageX + 84, y, 106, 8, "Descrição", d.descricao_carga || "", 18);
+      y += 8;
+
+      drawHeaderBar(doc, "DOCUMENTAÇÃO", pageX, y, pageW, 6);
+      y += 6;
+      drawCheckboxLine(doc, pageX, y, pageW, "Nota fiscal - Valor (R$)", d.tipo_documento === "Nota fiscal", d.tipo_documento === "Nota fiscal" ? d.valor_documento : "");
+      y += 7;
+      drawCheckboxLine(doc, pageX, y, pageW, "DC-e - Valor declarado (R$)", d.tipo_documento === "DC-e", d.tipo_documento === "DC-e" ? d.valor_documento : "");
+      y += 7;
+
+      if (d.numero_nota_fiscal) {
+        drawFieldCell(doc, pageX, y, pageW, 7, "Número da nota fiscal", d.numero_nota_fiscal || "", 42);
+        y += 7;
+      }
+      if (d.numero_dce) {
+        drawFieldCell(doc, pageX, y, pageW, 7, "Número do DC-e", d.numero_dce || "", 35);
+        y += 7;
+      }
+      if (d.anexo_dce_nome) {
+        drawFieldCell(doc, pageX, y, pageW, 7, "Anexo DC-e", d.anexo_dce_nome || "", 28);
+        y += 7;
+      }
+
+      drawHeaderBar(doc, "DECLARAÇÃO", pageX, y, pageW, 6);
+      y += 6;
+      const declaracaoH = 42;
+      drawBorder(doc, pageX, y, pageW, declaracaoH);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(5.8);
+      const declaracaoTexto = doc.splitTextToSize(String(d.declaracao_texto || ""), 186);
+      doc.text(declaracaoTexto.slice(0, 18), pageX + 1.5, y + 3.8);
+      y += declaracaoH;
+
+      drawHeaderBar(doc, "RESPONSÁVEL", pageX, y, pageW, 6);
+      y += 6;
+      drawFieldCell(doc, pageX, y, 55, 8, "Local", d.responsavel_local || "", 14);
+      drawFieldCell(doc, pageX + 55, y, 45, 8, "Data", d.responsavel_data || "", 14);
+      drawFieldCell(doc, pageX + 100, y, 90, 8, "Nome", d.responsavel_nome || "", 14);
+      y += 8;
+      drawFieldCell(doc, pageX, y, 55, 8, "RG", d.responsavel_rg || "", 14);
+
+      drawBorder(doc, pageX + 55, y, 135, 24);
+      doc.setFontSize(7);
+      doc.text("Assinatura", pageX + 57, y + 4);
+      if (assinaturaBase64) {
+        try { doc.addImage(assinaturaBase64, "PNG", pageX + 58, y + 5, 60, 16); } catch {}
+      }
+
+      const arrayBuffer = doc.output("arraybuffer");
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = "";
+      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+      const base64 = btoa(binary);
+      document.getElementById("pdf_base64").value = base64;
+      return { doc, base64 };
+    }
+
+    function configurarMascaras() {
+      const cnpjFrete = document.getElementById("cnpj_frete");
+      if (cnpjFrete) {
+        cnpjFrete.oninput = function(e) {
+          e.target.value = maskCNPJ(e.target.value);
+        };
+      }
+
+      document.querySelectorAll(".cpf-cnpj").forEach(el => {
+        el.oninput = function(e) {
+          e.target.value = maskCPForCNPJ(e.target.value);
+        };
+      });
+
+      document.querySelectorAll(".cep").forEach(el => {
+        el.oninput = function() {
+          let v = onlyDigits(el.value).slice(0, 8);
+          v = v.replace(/(\d{5})(\d)/, "$1-$2");
+          el.value = v;
+        };
+      });
+
+      document.querySelectorAll(".rg").forEach(el => {
+        el.oninput = function() {
+          let v = onlyDigits(el.value).slice(0, 9);
+          v = v.replace(/(\d{2})(\d)/, "$1.$2");
+          v = v.replace(/(\d{3})(\d)/, "$1.$2");
+          v = v.replace(/(\d{3})(\d)/, "$1-$2");
+          el.value = v;
+        };
+      });
+
+      document.querySelectorAll(".data").forEach(el => {
+        el.oninput = function() {
+          let v = onlyDigits(el.value).slice(0, 8);
+          v = v.replace(/(\d{2})(\d)/, "$1/$2");
+          v = v.replace(/(\d{2})(\d)/, "$1/$2");
+          el.value = v;
+        };
+      });
+
+      document.querySelectorAll(".money").forEach(el => {
+        el.oninput = function() {
+          let v = onlyDigits(el.value);
+          if (!v) {
+            el.value = "";
+            return;
+          }
+          v = (v / 100).toFixed(2);
+          v = v.replace(".", ",");
+          v = v.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+          el.value = "R$ " + v;
+        };
+      });
+
+      document.querySelectorAll('input[name="tipo_documento"]').forEach(r => {
+        r.onchange = toggleNumeroNotaFiscal;
+      });
+
+      document.querySelectorAll('input[name="frete"]').forEach(r => {
+        r.onchange = atualizarEstadoFrete;
+      });
+    }
+
+    function configurarAnexoDce() {
+      const anexoDceInput = document.getElementById("anexo_dce");
+      if (!anexoDceInput) return;
+
+      anexoDceInput.onchange = async function(event) {
+        const file = event.target.files && event.target.files[0];
+        const nome = document.getElementById("anexo_dce_nome");
+        const base = document.getElementById("anexo_dce_base64");
+        const status = document.getElementById("anexoDceStatus");
+
+        if (!file) {
+          nome.value = "";
+          base.value = "";
+          status.textContent = "Nenhum arquivo anexado.";
+          return;
+        }
+
+        try {
+          base.value = await fileToBase64(file);
+          nome.value = file.name;
+          status.textContent = "Arquivo anexado: " + file.name;
+        } catch {
+          nome.value = "";
+          base.value = "";
+          status.textContent = "Falha ao processar o arquivo.";
+        }
+      };
+    }
+
+    function configurarAssinatura() {
+      const canvas = document.getElementById("assinatura");
+      if (!canvas) return;
+
+      const ctx = canvas.getContext("2d");
+      const assinaturaInput = document.getElementById("assinatura_base64");
+      let assinando = false;
+
+      function ajustarCanvas() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * ratio;
+        canvas.height = rect.height * ratio;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(ratio, ratio);
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#000";
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, rect.width, rect.height);
+      }
+
+      function pos(evt) {
+        const rect = canvas.getBoundingClientRect();
+        if (evt.touches && evt.touches[0]) {
+          return {
+            x: evt.touches[0].clientX - rect.left,
+            y: evt.touches[0].clientY - rect.top
+          };
+        }
+        return {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
+      }
+
+      function startDraw(evt) {
+        evt.preventDefault();
+        assinando = true;
+        const p = pos(evt);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+      }
+
+      function moveDraw(evt) {
+        if (!assinando) return;
+        evt.preventDefault();
+        const p = pos(evt);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+      }
+
+      function endDraw(evt) {
+        if (!assinando) return;
+        evt.preventDefault();
+        assinando = false;
+        ctx.beginPath();
+        assinaturaInput.value = canvas.toDataURL("image/png");
+      }
+
+      document.getElementById("btnLimparAssinatura").onclick = function() {
+        ajustarCanvas();
+        assinaturaInput.value = "";
+      };
+
+      canvas.addEventListener("mousedown", startDraw);
+      canvas.addEventListener("mousemove", moveDraw);
+      canvas.addEventListener("mouseup", endDraw);
+      canvas.addEventListener("mouseleave", endDraw);
+      canvas.addEventListener("touchstart", startDraw, { passive: false });
+      canvas.addEventListener("touchmove", moveDraw, { passive: false });
+      canvas.addEventListener("touchend", endDraw, { passive: false });
+
+      window.addEventListener("resize", ajustarCanvas);
+      ajustarCanvas();
+    }
+
+    async function baixarPdf() {
+      try {
+        const { doc } = await gerarPdfBase64();
+        const numero = document.getElementById("numero_coleta").value || "minuta";
+        doc.save("minuta-" + numero + ".pdf");
+      } catch {
+        mostrarStatus("error", "Falha ao gerar PDF.");
+      }
+    }
+
+    async function enviarMinuta() {
+      try {
+        const { base64 } = await gerarPdfBase64();
+        const payload = coletarDados();
+        payload.pdf_base64 = base64;
+        payload.assinatura_base64 = document.getElementById("assinatura_base64").value || "";
+        payload.anexo_dce_nome = document.getElementById("anexo_dce_nome").value || "";
+        payload.anexo_dce_base64 = document.getElementById("anexo_dce_base64").value || "";
+
+        const response = await fetch("/api/minutas", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Falha ao enviar.");
+        mostrarStatus("success", "Minuta enviada com sucesso. ID: " + result.id);
+      } catch (e) {
+        mostrarStatus("error", e.message || "Erro no envio.");
+      }
+    }
+
+    window.onload = initMinuta;
+    window.addEventListener("resize", detectarCelular);
+  </script>
 </body>
 </html>
